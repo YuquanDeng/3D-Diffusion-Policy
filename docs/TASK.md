@@ -1,0 +1,70 @@
+# Task Choices
+Select the task in our script by `DomainName_TaskName`. For example, to use the Hammer task in Adroit, you should use `adroit_hammer` as the task name.
+
+- adroit 
+    - hammer
+    - door
+    - pen
+- dexart
+    - laptop
+    - faucet
+    - bucket
+    - toilet
+- metaworld
+  - **easy**
+    - button-press
+    - button-press-topdown
+    - button-press-topdown-wall
+    - button-press-wall
+    - coffee-button
+    - dial-turn
+    - door-close
+    - door-lock
+    - door-open
+    - door-unlock
+    - drawer-close
+    - drawer-open
+    - faucet-close
+    - faucet-open
+    - handle-press
+    - handle-press-side
+    - handle-pull
+    - handle-pull-side
+    - lever-pull
+    - plate-slide
+    - plate-slide-back
+    - plate-slide-back-side
+    - plate-slide-side
+    - reach
+    - reach-wall
+    - window-close
+    - window-open
+    - peg-unplug-side
+  - **medium**
+    - basketball
+    - bin-picking
+    - box-close
+    - coffee-pull
+    - coffee-push
+    - hammer
+    - peg-insert-side
+    - push-wall
+    - soccer
+    - sweep
+    - sweep-into
+  - **hard**
+    - assembly
+    - hand-insert
+    - pick-out-of-hole
+    - pick-place
+    - push
+    - push-back
+
+  - **very hard**
+    - shelf-place
+    - disassemble
+    - stick-pull
+    - stick-push
+    - pick-place-wall
+
+
