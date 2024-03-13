@@ -1,8 +1,8 @@
 defaults:
-  - task: dexdeform_flip_pointcloud
+  - task: rlbench_light_bulb_in_pointcloud
 
 name: train_diffusion_unet_hybrid
-_target_: diffusion_policy_3d.workspace.train_diffusion_unet_hybrid_pointcloud_workspace.TrainDiffusionUnetHybridPointcloudWorkspace
+_target_: diffusion_policy_3d.workspace.train_diffusion_rlbench_pointcloud_workspace.TrainDiffusionRLBenchPointcloudWorkspace
 
 task_name: ${task.name}
 shape_meta: ${task.shape_meta}

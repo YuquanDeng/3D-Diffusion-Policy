@@ -1,7 +1,6 @@
 # Examples:
-# bash scripts/train_policy.sh dp3 adroit_hammer_pointcloud 1257 0 0
+# bash scripts/train_policy.sh dp3_rlbench rlbench_light_bulb_in_pointcloud 1111 0 0
 
-# question: what should be the task name?
 # NOTE: set DEBUG to True.
 DEBUG=True
 save_ckpt=False
