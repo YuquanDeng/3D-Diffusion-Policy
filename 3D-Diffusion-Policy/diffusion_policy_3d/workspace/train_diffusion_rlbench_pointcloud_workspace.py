@@ -105,11 +105,14 @@ class TrainDiffusionRLBenchPointcloudWorkspace(TrainDiffusionUnetHybridPointclou
                 cfg.ema,
                 model=self.ema_model)
 
-        # configure env
-        env_runner: BasePointcloudRunner
-        env_runner = hydra.utils.instantiate(
-            cfg.task.env_runner,
-            output_dir=self.output_dir)
+        # # configure env
+        # env_runner: BasePointcloudRunner
+        # env_runner = hydra.utils.instantiate(
+        #     cfg.task.env_runner,
+        #     output_dir=self.output_dir)
+        
+        # TODO: implement RLBench env_runner
+        env_runner = None
 
         if env_runner is not None:
             assert isinstance(env_runner, BasePointcloudRunner)

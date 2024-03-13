@@ -1,9 +1,8 @@
 # Examples:
 # bash scripts/train_policy.sh dp3_rlbench rlbench_light_bulb_in_pointcloud 1111 0 0
 
-# NOTE: set DEBUG to True.
-DEBUG=True
-save_ckpt=False
+DEBUG=False
+save_ckpt=True
 
 alg_name=${1}
 # task choices: light_bulb_in

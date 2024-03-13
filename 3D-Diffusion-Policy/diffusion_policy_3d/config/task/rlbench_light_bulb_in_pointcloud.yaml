@@ -8,7 +8,7 @@ shape_meta: &shape_meta
       shape: [1024, 3]
       type: point_cloud
     agent_pos:
-      shape: [3]
+      shape: [4]
       type: low_dim
   action:
     shape: [8]

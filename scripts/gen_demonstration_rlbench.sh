@@ -15,7 +15,7 @@ use_script_policy=False
 
 export CUDA_VISIBLE_DEVICES=0
 python gen_demonstration_rlbench.py --env_name=${task_name} \
-            --num_episodes 10 \
+            --num_episodes 100 \
             --root_dir "/home/nil/manipulation/RVT2/rvt/data/rlbench_data/128x128/" \
             --save_dir "/home/nil/manipulation/3D-Diffusion-Policy/3D-Diffusion-Policy/data" \
             --use_point_crop True \

@@ -134,7 +134,7 @@ logging:
   resume: true
   tags:
   - train_diffusion_unet_hybrid
-  - dexdeform
+  - rlbench
 
 checkpoint:
   save_ckpt: False # if True, save checkpoint every checkpoint_every
