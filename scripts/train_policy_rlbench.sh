@@ -1,5 +1,5 @@
 # Examples:
-# bash scripts/train_policy.sh dp3_rlbench rlbench_light_bulb_in_pointcloud 1111 0 0
+# bash scripts/train_policy_rlbench.sh dp3_rlbench rlbench_light_bulb_in_pointcloud 1111 0 0
 
 DEBUG=False
 save_ckpt=True
