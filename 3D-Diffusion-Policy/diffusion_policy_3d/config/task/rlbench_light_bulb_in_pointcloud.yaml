@@ -15,16 +15,22 @@ shape_meta: &shape_meta
 
 env_runner:
   _target_: diffusion_policy_3d.env_runner.rlbench_pointcloud_runner.RLBenchPointcloudRunner
-  eval_episodes: 20
+  eval_episodes: 25
   n_obs_steps: ${n_obs_steps}
   n_action_steps: ${n_action_steps}
-  fps: 10
-  n_envs: null
-  n_train: null
-  n_test: null
+  # fps: 10
+  # n_envs: null
+  # n_train: null
+  # n_test: null
   task_name: ${task_name}
   device: ${training.device}
   use_point_crop: ${policy.use_point_crop}
+  num_points: 1024
+  eval_datafolder: /home/nil/manipulation/RVT2/rvt/data/val
+  episode_length: 25    # maximum control steps allowed for each episode
+  headless: True
+  record_every_n: -1 
+  cameras: [front, left_shoulder, right_shoulder, wrist]
 
 dataset:
   # _target_: diffusion_policy_3d.dataset.metaworld_pointcloud_dataset.MetaworldPointcloudDataset
