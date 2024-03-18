@@ -27,6 +27,7 @@ env_runner:
   use_point_crop: ${policy.use_point_crop}
   num_points: 1024
   eval_datafolder: /home/nil/manipulation/RVT2/rvt/data/val
+  # eval_datafolder: /home/nil/manipulation/RVT2/rvt/data/rlbench_data/128x128 # FOR DEBUGGING!
   episode_length: 25    # maximum control steps allowed for each episode
   headless: True
   record_every_n: -1 

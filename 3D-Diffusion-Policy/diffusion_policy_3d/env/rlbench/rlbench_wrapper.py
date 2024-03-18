@@ -13,6 +13,12 @@ from pyrep.const import RenderMode
 from rlbench.action_modes.action_mode import MoveArmThenGripper
 from rlbench.backend.observation import Observation
 
+from yarr.agents.agent import ActResult, VideoSummary, TextSummary
+from yarr.utils.transition import Transition
+from pyrep.errors import IKError, ConfigurationPathError
+from rlbench.backend.exceptions import InvalidActionError
+from yarr.utils.process_str import change_case
+
 # EndEffectorPoseViaPlanning2
 import numpy as np
 from rlbench.action_modes.arm_action_modes import (
@@ -243,3 +249,53 @@ class RLBenchEnv(CustomMultiTaskRLBenchEnv):
         self._recorded_images.clear()
 
         return self._previous_obs_dict
+
+    def step(self, act_result: ActResult) -> Transition:
+        action = act_result.action
+        success = False
+        obs = self._previous_obs_dict  # in case action fails.
+
+        try:
+            obs, reward, terminal = self._task.step(action)
+            if reward >= 1:
+                success = True
+                reward *= self._reward_scale
+            else:
+                reward = 0.0
+            obs = self.extract_obs(obs)
+            self._previous_obs_dict = obs
+        except (IKError, ConfigurationPathError, InvalidActionError) as e:
+            terminal = True
+            reward = 0.0
+
+            if isinstance(e, IKError):
+                self._error_type_counts['IKError'] += 1
+            elif isinstance(e, ConfigurationPathError):
+                self._error_type_counts['ConfigurationPathError'] += 1
+            elif isinstance(e, InvalidActionError):
+                self._error_type_counts['InvalidActionError'] += 1
+
+            self._last_exception = e
+
+        summaries = []
+        self._i += 1
+        if ((terminal or self._i == self._episode_length) and
+                self._record_current_episode):
+            self._append_final_frame(success)
+            vid = np.array(self._recorded_images).transpose((0, 3, 1, 2))
+            task_name = change_case(self._task._task.__class__.__name__)
+            summaries.append(VideoSummary(
+                'episode_rollout_' + ('success' if success else 'fail') + f'/{task_name}',
+                vid, fps=30))
+
+            # error summary
+            error_str = f"Errors - IK : {self._error_type_counts['IKError']}, " \
+                        f"ConfigPath : {self._error_type_counts['ConfigurationPathError']}, " \
+                        f"InvalidAction : {self._error_type_counts['InvalidActionError']}"
+            if not success and self._last_exception is not None:
+                error_str += f"\n Last Exception: {self._last_exception}"
+                self._last_exception = None
+
+            summaries.append(TextSummary('errors', f"Success: {success} | " + error_str))
+        return Transition(obs, reward, terminal, summaries=summaries)
+        # return obs, reward, terminal, summaries
