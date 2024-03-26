@@ -20,4 +20,5 @@ python gen_demonstration_rlbench.py --env_name=${task_name} \
             --save_dir "/home/nil/manipulation/3D-Diffusion-Policy/3D-Diffusion-Policy/data" \
             --use_point_crop True \
             --num_points 1024 \
-            --use_script_policy $use_script_policy
+            --use_script_policy $use_script_policy \
+            --rot_representation euler

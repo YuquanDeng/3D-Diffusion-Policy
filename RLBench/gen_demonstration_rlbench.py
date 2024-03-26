@@ -23,7 +23,9 @@ import visualizer
 
 TASK_BOUDNS = {
     # x_min, y_min, z_min, x_max, y_max, z_max
-    'default': [-1, -100, 0, 100, 100, 100],
+    'default': [-1, -100, 0.78, 100, 100, 100],
+    'remove_scene': [-1, -100, 0, 100, 100, 100],
+    'remove_table': [-1, -100, 0.6, 100, 100, 100],
 }
 
 seed = np.random.randint(0, 100)
@@ -132,9 +134,9 @@ def main(args):
 
             point_cloud = point_cloud_sampling(point_cloud, num_points, 'fps') # (num_points, 3)
 
-            # # debugging
-            # visualizer.visualize_pointcloud(point_cloud)
-            # import pdb; pdb.set_trace()
+            # debugging
+            visualizer.visualize_pointcloud(point_cloud)
+            import pdb; pdb.set_trace()
 
             obs_dict = {
                 "image": obs.front_rgb,
@@ -162,8 +164,13 @@ def main(args):
             # action = pi.select_action(raw_state)
             # if args.use_script_policy:
             # 	action = mw_action
-            action = np.concatenate([obs.gripper_pose, np.array([obs_dict["grip"]])]) # xyz(3) + quaternion(4) + gripper state(1)
-
+            if args.rot_representation == "quat":
+                action = np.concatenate([obs.gripper_pose, np.array([obs_dict["grip"]])]) # xyz(3) + quaternion(4) + gripper state(1)
+            elif args.rot_representation == "euler":
+                # TODO: figure out is it wxyz or xyzw.
+                raise NotImplementedError
+            else:
+                raise NotImplementedError
             action_arrays_sub.append(action)
             # raw_state, reward, done, info = e.step(action)
             # obs_dict = e.get_visual_obs()
@@ -273,6 +280,7 @@ if __name__ == "__main__":
 
     # RLBench
     arg.add_arg('save_dir', '/home/nil/manipulation/3D-Diffusion-Policy/3D-Diffusion-Policy/data', 'directory to save data')
+    arg.add_arg('rot_representation', "quat", "rotation action: quaternion or euler")
     arg.parser()
 
     config = dmc_config  
