@@ -20,6 +20,7 @@ import imageio
 from rlbench_utils import get_stored_demo
 from diffusion_policy_3d.gym_util.mjpc_wrapper import point_cloud_sampling
 import visualizer
+from scipy.spatial.transform import Rotation
 
 TASK_BOUDNS = {
     # x_min, y_min, z_min, x_max, y_max, z_max
@@ -27,6 +28,7 @@ TASK_BOUDNS = {
     'remove_scene': [-1, -100, 0, 100, 100, 100],
     'remove_table': [-1, -100, 0.6, 100, 100, 100],
 }
+ROTATION_RESOLUTION = 5 # degree increments per axis
 
 seed = np.random.randint(0, 100)
 
@@ -40,10 +42,102 @@ seed = np.random.randint(0, 100)
 # 		agent = eval(task_name)()
 # 	return agent
 
+def normalize_quaternion(quat):
+    return np.array(quat) / np.linalg.norm(quat, axis=-1, keepdims=True)
+
+def sensitive_gimble_fix(euler):
+    """
+    :param euler: euler angles in degree as np.ndarray in shape either [3] or
+    [b, 3]
+    """
+    # selecting sensitive angle
+    select1 = (89 < euler[..., 1]) & (euler[..., 1] < 91)
+    euler[select1, 1] = 90
+    # selecting sensitive angle
+    select2 = (-91 < euler[..., 1]) & (euler[..., 1] < -89)
+    euler[select2, 1] = -90
+
+    # recalulating the euler angles, see assert
+    r = Rotation.from_euler("xyz", euler, degrees=True)
+    euler = r.as_euler("xyz", degrees=True)
+
+    select = select1 | select2
+    assert (euler[select][..., 2] == 0).all(), euler
+
+    # uncomment the following to move values from x to z while keeping the
+    # angle same i.e. x becomes 0 and z has the values
+    # TODO: verify if this helps
+    ######################################################################
+    ## when y=90, x-z is invariant
+    # euler[select1, 2] = -euler[select1, 0]
+    # euler[select1, 0] = 0
+
+    ## when y=-90, x+z is invariant
+    # euler[select2, 2] = euler[select2, 0]
+    # euler[select2, 0] = 0
+    ######################################################################
+
+    return euler
+
+def _quaternion_to_discrete_euler(
+    quaternion, resolution, gimble_fix=True,
+    norm_operation=True):
+    """
+    :param quaternion: quaternion in shape [4]
+    :param gimble_fix: the euler values for x and y can be very sensitive
+        around y=90 degrees. this leads to a multimodal distribution of x and y
+        which could be hard for a network to learn. When gimble_fix is true, around
+        y=90, we change the mode towards x=0, potentially making it easy for the
+        network to learn.
+    :param norm_operation: if True, normalize the quaternion before converting
+    just like peract. we haven't tested if this is necessarily required
+    """
+    if norm_operation:
+        quaternion = normalize_quaternion(quaternion)
+        if quaternion[-1] < 0:
+            quaternion = -quaternion
+
+    r = Rotation.from_quat(quaternion)
+
+    euler = r.as_euler("xyz", degrees=True)
+    if gimble_fix:
+        euler = sensitive_gimble_fix(euler)
+
+    euler += 180
+    assert np.min(euler) >= 0 and np.max(euler) <= 360
+    disc = np.around((euler / resolution)).astype(int)
+    disc[disc == int(360 / resolution)] = 0
+    return disc
+
+def quaternion_to_discrete_euler(
+    quaternion, resolution, gimble_fix=True,
+    norm_operation=True):
+    """
+    :param quaternion: quaternion in shape [4] or [b, 4]
+    :param gimble_fix: the euler values for x and y can be very sensitive
+        around y=90 degrees. this leads to a multimodal distribution of x and y
+        which could be hard for a network to learn. When gimble_fix is true, around
+        y=90, we change the mode towards x=0, potentially making it easy for the
+        network to learn.
+    :param norm_operation: if True, normalize the quaternion before converting
+    just like peract. we haven't tested if this is necessarily required
+    """
+    assert quaternion.shape[-1] == 4
+    assert quaternion.ndim in [1, 2]
+    if quaternion.ndim == 1:
+        return _quaternion_to_discrete_euler(
+            quaternion, resolution, gimble_fix, norm_operation)
+    else:
+        out = np.array([
+            _quaternion_to_discrete_euler(
+                q, resolution, gimble_fix, norm_operation)
+            for q in quaternion])
+        return out
+    
 def main(args):
     env_name = args.env_name
 
-    save_dir = os.path.join(args.save_dir, 'rlbench_'+args.env_name+'_expert.zarr')
+    save_dir = os.path.join(args.save_dir, 'rlbench_'+args.env_name+f'_{args.rot_representation}'+'_expert.zarr')
     if os.path.exists(save_dir):
         cprint('Data already exists at {}'.format(save_dir), 'red')
         cprint("If you want to overwrite, delete the existing directory first.", "red")
@@ -134,9 +228,9 @@ def main(args):
 
             point_cloud = point_cloud_sampling(point_cloud, num_points, 'fps') # (num_points, 3)
 
-            # debugging
-            visualizer.visualize_pointcloud(point_cloud)
-            import pdb; pdb.set_trace()
+            # # debugging
+            # visualizer.visualize_pointcloud(point_cloud)
+            # import pdb; pdb.set_trace()
 
             obs_dict = {
                 "image": obs.front_rgb,
@@ -145,7 +239,6 @@ def main(args):
                 "depth": obs.front_depth,
                 "grip": float(obs.gripper_open),
             }
-
 
             total_count_sub += 1
 
@@ -167,8 +260,9 @@ def main(args):
             if args.rot_representation == "quat":
                 action = np.concatenate([obs.gripper_pose, np.array([obs_dict["grip"]])]) # xyz(3) + quaternion(4) + gripper state(1)
             elif args.rot_representation == "euler":
-                # TODO: figure out is it wxyz or xyzw.
-                raise NotImplementedError
+                quat = obs.gripper_pose[3:]
+                disc_rot = quaternion_to_discrete_euler(quat, resolution=ROTATION_RESOLUTION)
+                action = np.concatenate([np.append(obs.gripper_pose[:3], disc_rot), np.array([obs_dict["grip"]])]) # xyz(3) + euler(3) + gripper state(1)           
             else:
                 raise NotImplementedError
             action_arrays_sub.append(action)
