@@ -23,6 +23,7 @@ from yarr.utils.stat_accumulator import SimpleAccumulator
 from yarr.utils.transition import ReplayTransition
 from yarr.agents.agent import ActResult
 from yarr.agents.agent import VideoSummary
+from copy import deepcopy
 
 class RLBenchPointcloudRunner(BasePointcloudRunner):
     def __init__(self,
@@ -50,6 +51,7 @@ class RLBenchPointcloudRunner(BasePointcloudRunner):
                  device="cuda:0",
                  use_point_crop=True,
                  num_points=512,
+                 save_video=False
                  ):
         super().__init__(output_dir)
         self.task_name = task_name
@@ -65,7 +67,12 @@ class RLBenchPointcloudRunner(BasePointcloudRunner):
         #         max_episode_steps=max_steps,
         #         reward_agg_method='sum',
         #     )
-        
+
+        if save_video:
+            record_every_n = 1
+        cprint(f"save video: {save_video}", 'green')
+        self.save_video = save_video
+
         #TODO: add SimpleVideoRecordingWrapper
         def env_fn(task_name):
             return RLBenchEnv(
@@ -202,7 +209,6 @@ class RLBenchPointcloudRunner(BasePointcloudRunner):
     # TODO: fix logging, log_dir, save_video, and replay_ground_truth params.
     def run(self, policy: BasePointcloudPolicy, 
                 log_dir: str = "/home/nil/manipulation/debug",
-                save_video: bool = True,
                 replay_ground_truth: bool = False
             ):
 
@@ -260,10 +266,12 @@ class RLBenchPointcloudRunner(BasePointcloudRunner):
         print(f"[Evaluation] Finished {task_name} | Final Score: {task_score}\n")
         scores.append(task_score)
 
-        if save_video:
+        if self.save_video:
             import cv2
             import shutil
 
+
+            # import pdb;pdb.set_trace()
             video_image_folder = "./tmp"
             record_fps = 25
             record_folder = os.path.join(log_dir, "videos")
@@ -276,18 +284,25 @@ class RLBenchPointcloudRunner(BasePointcloudRunner):
                     video = deepcopy(summary.value)
                     video = np.transpose(video, (0, 2, 3, 1))
                     video = video[:, :, :, ::-1]
-                    if task_rewards[video_cnt] > 99:
-                        video_path = os.path.join(
-                            record_folder,
-                            f"{task_name}_success_{video_success_cnt}.mp4",
-                        )
-                        video_success_cnt += 1
-                    else:
-                        video_path = os.path.join(
-                            record_folder, f"{task_name}_fail_{video_fail_cnt}.mp4"
-                        )
-                        video_fail_cnt += 1
+                    # if task_rewards[video_cnt] > 99:
+                    #     video_path = os.path.join(
+                    #         record_folder,
+                    #         f"{task_name}_success_{video_success_cnt}.mp4",
+                    #     )
+                    #     video_success_cnt += 1
+                    # else:
+                    #     video_path = os.path.join(
+                    #         record_folder, f"{task_name}_fail_{video_fail_cnt}.mp4"
+                    #     )
+                    #     video_fail_cnt += 1
+
+                    # TODO: fix this.
+                    video_path = os.path.join(
+                        record_folder, f"{task_name}_fail_{video_fail_cnt}.mp4"
+                    )
+                    video_fail_cnt += 1                    
                     video_cnt += 1
+
                     os.makedirs(video_image_folder, exist_ok=True)
                     for idx in range(len(video) - 10):
                         cv2.imwrite(
