@@ -312,3 +312,33 @@ class TrainDiffusionRLBenchPointcloudWorkspace(TrainDiffusionUnetHybridPointclou
                 self.global_step += 1
                 self.epoch += 1
                 del step_log
+
+    def eval(self):
+        # load the latest checkpoint
+        
+        cfg = copy.deepcopy(self.cfg)
+        
+        lastest_ckpt_path = self.get_checkpoint_path(tag="latest")
+        if lastest_ckpt_path.is_file():
+            cprint(f"Resuming from checkpoint {lastest_ckpt_path}", 'magenta')
+            self.load_checkpoint(path=lastest_ckpt_path)
+        
+        # configure env
+        env_runner: BasePointcloudRunner
+        env_runner = hydra.utils.instantiate(
+            cfg.task.env_runner,
+            output_dir=self.output_dir)
+        assert isinstance(env_runner, BasePointcloudRunner)
+        policy = self.model
+        if cfg.training.use_ema:
+            policy = self.ema_model
+        policy.eval()
+        policy.cuda()
+
+        runner_log = env_runner.run(policy)
+        
+      
+        cprint(f"---------------- Eval Results --------------", 'magenta')
+        for key, value in runner_log.items():
+            if isinstance(value, float):
+                cprint(f"{key}: {value:.4f}", 'magenta')
