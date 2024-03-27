@@ -335,10 +335,11 @@ class TrainDiffusionRLBenchPointcloudWorkspace(TrainDiffusionUnetHybridPointclou
         policy.eval()
         policy.cuda()
 
-        runner_log = env_runner.run(policy)
+        # runner_log = env_runner.run(policy)
         
-      
-        cprint(f"---------------- Eval Results --------------", 'magenta')
-        for key, value in runner_log.items():
-            if isinstance(value, float):
-                cprint(f"{key}: {value:.4f}", 'magenta')
+        # cprint(f"---------------- Eval Results --------------", 'magenta')
+        # for key, value in runner_log.items():
+        #     if isinstance(value, float):
+        #         cprint(f"{key}: {value:.4f}", 'magenta')
+
+        env_runner.run(policy)

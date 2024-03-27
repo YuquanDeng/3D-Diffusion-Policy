@@ -68,7 +68,7 @@ from omegaconf import OmegaConf
 class RLBenchPointcloudRunner(BasePointcloudRunner):
     def __init__(self,
                  output_dir=None,
-                 eval_episodes=20,
+                #  eval_episodes=20,
                  max_steps=1000,
                  n_obs_steps=8,
                  n_action_steps=8,
@@ -82,7 +82,17 @@ class RLBenchPointcloudRunner(BasePointcloudRunner):
                  n_test=None,
                  device="cuda:0",
                  use_point_crop=True,
-                 num_points=512
+                 num_points=512,
+                 # RLBench configs
+                 tasks_to_eval=None,
+                 cameras=["front", "left_shoulder", "right_shoulder", "wrist"],
+                 eval_datafolder=None,
+                 start_episode=0,
+                 eval_episodes=5,
+                 episode_length=25,
+                 record_every_n=-1,
+                 ground_truth=False,
+                 headless=False,
                  ):
         super().__init__(output_dir)
         # self.task_name = task_name
@@ -111,24 +121,36 @@ class RLBenchPointcloudRunner(BasePointcloudRunner):
 
         # self.logger_util_test = logger_util.LargestKRecorder(K=3)
         # self.logger_util_test10 = logger_util.LargestKRecorder(K=5)
+        
+        self.tasks_to_eval = tasks_to_eval
+        self.cameras = cameras
+        self.eval_datafolder = eval_datafolder
+        self.start_episode = start_episode
+        self.eval_episodes = eval_episodes
+        self.episode_length = episode_length
+        self.record_every_n = record_every_n
+        self.ground_truth = ground_truth
+        self.device = device
+        self.headless = headless
+        self.task_name = task_name
 
     @torch.no_grad()
-    def run(self, 
-            agent,
-            tasks,
-            cameras,
-            eval_datafolder,
-            start_episode=0,
-            eval_episodes=25,
-            episode_length=25,
-            record_every_n=-1,
-            replay_ground_truth=False,
-            device=0,
-            headless=True,
-            verbose=True,
-            logging=False,
-            save_video=False
-        ):
+    def run(self, policy: BasePointcloudPolicy):
+        agent=policy
+        tasks=self.task_name
+        cameras=self.cameras
+        eval_datafolder=self.eval_datafolder
+        start_episode=self.start_episode
+        eval_episodes=self.eval_episodes
+        episode_length=self.episode_length
+        record_every_n=self.record_every_n
+        replay_ground_truth=self.ground_truth
+        device=self.device
+        headless=self.headless
+        verbose=True
+        logging=False
+        save_video=False
+
         # agent.eval()
         camera_resolution = [IMAGE_SIZE, IMAGE_SIZE]
         obs_config = create_obs_config(cameras, camera_resolution, method_name="")
@@ -182,7 +204,7 @@ class RLBenchPointcloudRunner(BasePointcloudRunner):
 
         eval_env.eval = True
 
-        device = f"cuda:{device}"
+        # device = f"cuda:{device}"
 
         rollout_generator = RolloutGenerator(device)
         stats_accumulator = SimpleAccumulator(eval_video_fps=30)
