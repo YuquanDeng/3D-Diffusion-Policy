@@ -94,6 +94,9 @@ class RLBenchPointcloudRunner(BasePointcloudRunner):
                  record_every_n=-1,
                  ground_truth=False,
                  headless=False,
+                 # representation config
+                 rotation_euler=False,
+                 task_bound=None
                  ):
         super().__init__(output_dir)
         # self.task_name = task_name
@@ -134,6 +137,12 @@ class RLBenchPointcloudRunner(BasePointcloudRunner):
         self.device = device
         self.headless = headless
         self.task_name = task_name
+        
+        # representation config
+        self.use_point_crop = use_point_crop
+        self.rotation_euler = rotation_euler
+        self.task_bound = task_bound
+        self.num_points = num_points
 
     @torch.no_grad()
     def run(self, policy: BasePointcloudPolicy):
@@ -207,7 +216,13 @@ class RLBenchPointcloudRunner(BasePointcloudRunner):
 
         # device = f"cuda:{device}"
 
-        rollout_generator = RolloutGenerator(device)
+        rollout_generator = RolloutGenerator(
+            env_device=device,
+            use_point_crop=self.use_point_crop,
+            rotation_euler = self.rotation_euler,
+            task_bound=self.task_bound,
+            num_points=self.num_points
+            )
         stats_accumulator = SimpleAccumulator(eval_video_fps=30)
 
         eval_env.launch()

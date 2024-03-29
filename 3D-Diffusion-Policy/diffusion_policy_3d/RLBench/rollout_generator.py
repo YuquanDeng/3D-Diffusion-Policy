@@ -19,14 +19,51 @@ from yarr.agents.agent import Agent
 from yarr.envs.env import Env
 from yarr.utils.transition import ReplayTransition
 from yarr.agents.agent import ActResult
-
-def rlbench_obs2diffusion_policy_obs(obs):
-    raise NotImplementedError
+from diffusion_policy_3d.gym_util.mjpc_wrapper import point_cloud_sampling
+import visualizer
 
 class RolloutGenerator(object):
 
-    def __init__(self, env_device = 'cuda:0'):
+    def __init__(self, 
+                env_device = 'cuda:0', 
+                use_point_crop = True, 
+                rotation_euler = False,
+                task_bound = None,
+                num_points = 512):
         self._env_device = env_device
+        self.use_point_crop = use_point_crop
+        self.rotation_euler = rotation_euler
+        self.task_bound = task_bound
+        self.num_points = num_points
+
+        if self.use_point_crop:
+            x_min, y_min, z_min, x_max, y_max, z_max = task_bound['default']
+            self.min_bound = [x_min, y_min, z_min]
+            self.max_bound = [x_max, y_max, z_max]
+
+    def rlbench_obs2diffusion_policy_obs(self, obs_history):
+        point_cloud = obs_history["front_point_cloud"][0].transpose((1, 2, 0)).reshape(-1, 3) # (H, W, 3) -> (H*W, 3)
+        # NOTE: crop background.
+        if self.use_point_crop:
+            mask = np.all(point_cloud[:, :3] > self.min_bound, axis=1)
+            point_cloud = point_cloud[mask]
+
+            mask = np.all(point_cloud[:, :3] < self.max_bound, axis=1)
+            point_cloud = point_cloud[mask]   
+
+        point_cloud = point_cloud_sampling(point_cloud, self.num_points, 'fps') # (num_points, 3)
+
+        # # debugging
+        # import pdb; pdb.set_trace()
+        # visualizer.visualize_pointcloud(point_cloud)
+        
+        agent_pos = np.concatenate([obs_history["gripper_pose"][0:3], obs_history["gripper_open"]])
+        output_obs_history = {
+            "agent_pos": [agent_pos],
+            "point_cloud": [point_cloud],
+        }
+        
+        return output_obs_history
 
     def _get_type(self, x):
         if x.dtype == np.float64:
@@ -49,7 +86,7 @@ class RolloutGenerator(object):
         agent.reset()
         obs_history = {k: [np.array(v, dtype=self._get_type(v))] * timesteps for k, v in obs.items()}
         for step in range(episode_length):
-
+            obs_history = self.rlbench_obs2diffusion_policy_obs(obs_history)
             prepped_data = {k:torch.tensor(np.array([v]), device=self._env_device) for k, v in obs_history.items()}
             if not replay_ground_truth:
                 act_result = agent.act(step_signal.value, prepped_data,
