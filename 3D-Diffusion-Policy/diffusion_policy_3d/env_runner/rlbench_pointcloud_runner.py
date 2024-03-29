@@ -28,7 +28,8 @@ from diffusion_policy_3d.RLBench.utils.rlbench_planning import (
     EndEffectorPoseViaPlanning2 as EndEffectorPoseViaPlanning,
 )
 
-from yarr.utils.rollout_generator import RolloutGenerator
+# from yarr.utils.rollout_generator import RolloutGenerator
+from diffusion_policy_3d.RLBench.rollout_generator import RolloutGenerator
 from yarr.utils.stat_accumulator import SimpleAccumulator
 # from yarr.utils.log_writer import LogWriter
 # from yarr.agents.agent import VideoSummary

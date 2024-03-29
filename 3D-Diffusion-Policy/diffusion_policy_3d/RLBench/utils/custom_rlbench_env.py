@@ -279,7 +279,8 @@ class CustomMultiTaskRLBenchEnv(MultiTaskRLBenchEnv):
         # obs.gripper_pose = grip_pose
         obs.joint_positions = joint_pos
         obs.gripper_pose = grip_pose
-        # obs_dict['gripper_pose'] = grip_pose
+        obs_dict['gripper_pose'] = obs.gripper_pose
+        obs_dict['gripper_open'] = obs.gripper_open
         return obs_dict
 
     def launch(self):
