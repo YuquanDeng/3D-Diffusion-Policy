@@ -64,7 +64,10 @@ from diffusion_policy_3d.RLBench.rlbench_utils import (
     RLBENCH_TASKS,
     IMAGE_SIZE,
 )
+# LOGGING
 from omegaconf import OmegaConf
+from yarr.agents.agent import VideoSummary
+from copy import deepcopy
 
 class RLBenchPointcloudRunner(BasePointcloudRunner):
     def __init__(self,
@@ -94,6 +97,8 @@ class RLBenchPointcloudRunner(BasePointcloudRunner):
                  record_every_n=-1,
                  ground_truth=False,
                  headless=False,
+                 save_video=False,
+                 log_dir=None,
                  # representation config
                  rotation_euler=False,
                  task_bound=None,
@@ -133,7 +138,13 @@ class RLBenchPointcloudRunner(BasePointcloudRunner):
         self.start_episode = start_episode
         self.eval_episodes = eval_episodes
         self.episode_length = episode_length
+
+        self.save_video = save_video
+        if self.save_video:
+            record_every_n = 1
         self.record_every_n = record_every_n
+        self.log_dir = log_dir
+
         self.ground_truth = ground_truth
         self.device = device
         self.headless = headless
@@ -163,7 +174,7 @@ class RLBenchPointcloudRunner(BasePointcloudRunner):
         headless=self.headless
         verbose=True
         logging=False
-        save_video=False
+        save_video=self.save_video
 
         # agent.eval()
         camera_resolution = [IMAGE_SIZE, IMAGE_SIZE]
@@ -190,11 +201,11 @@ class RLBenchPointcloudRunner(BasePointcloudRunner):
                 raise ValueError("Task %s not recognised!." % task)
             task_classes.append(task_file_to_task_class(task))
 
-        if not logging:
-            record_every_n = -1
+        # if not logging:
+        #     record_every_n = -1
 
-        if save_video:
-            record_every_n = 1
+        # if save_video:
+        #     record_every_n = 1
 
         if set(cameras) == set(["front", "left_shoulder", "right_shoulder", "wrist"]):
             RLBenchEnv = CustomMultiTaskRLBenchEnv
@@ -280,6 +291,54 @@ class RLBenchPointcloudRunner(BasePointcloudRunner):
             summaries = []
             summaries.extend(stats_accumulator.pop())
             task_name = tasks[task_id]
+
+            if self.save_video:
+                import cv2
+                import shutil
+
+                video_image_folder = "./tmp"
+                record_fps = 25
+                record_folder = os.path.join(self.log_dir, "videos")
+                os.makedirs(record_folder, exist_ok=True)
+                video_success_cnt = 0
+                video_fail_cnt = 0
+                video_cnt = 0
+                for summary in summaries:
+                    if isinstance(summary, VideoSummary):
+                        video = deepcopy(summary.value)
+                        video = np.transpose(video, (0, 2, 3, 1))
+                        video = video[:, :, :, ::-1]
+                        if task_rewards[video_cnt] > 99:
+                            video_path = os.path.join(
+                                record_folder,
+                                f"{task_name}_success_{video_success_cnt}.mp4",
+                            )
+                            video_success_cnt += 1
+                        else:
+                            video_path = os.path.join(
+                                record_folder, f"{task_name}_fail_{video_fail_cnt}.mp4"
+                            )
+                            video_fail_cnt += 1
+                        video_cnt += 1
+                        os.makedirs(video_image_folder, exist_ok=True)
+                        for idx in range(len(video) - 10):
+                            cv2.imwrite(
+                                os.path.join(video_image_folder, f"{idx}.png"), video[idx]
+                            )
+                        images_path = os.path.join(video_image_folder, r"%d.png")
+                        os.system(
+                            "ffmpeg -i {} -vf palettegen palette.png -hide_banner -loglevel error".format(
+                                images_path
+                            )
+                        )
+                        os.system(
+                            "ffmpeg -framerate {} -i {} -i palette.png -lavfi paletteuse {} -hide_banner -loglevel error".format(
+                                record_fps, images_path, video_path
+                            )
+                        )
+                        os.remove("palette.png")
+                        shutil.rmtree(video_image_folder)
+                        cprint(f"saved {video_path}", "green")
 
         eval_env.shutdown()
         return scores

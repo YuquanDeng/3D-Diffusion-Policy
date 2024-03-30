@@ -46,6 +46,8 @@ env_runner:
   ground_truth: False
   # device: 0
   headless: True
+  save_video: True
+  log_dir: /home/nil/manipulation/3D-Diffusion-Policy/debug
   
   # Representation config
   rotation_resolution: 5
