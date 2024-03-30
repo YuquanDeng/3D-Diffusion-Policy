@@ -1,4 +1,4 @@
-from utils.config import Config
+from diffusion_policy_3d.RLBench.utils.config import Config
 
 dmc_config = Config({
     "project_name": "BAC-v0",

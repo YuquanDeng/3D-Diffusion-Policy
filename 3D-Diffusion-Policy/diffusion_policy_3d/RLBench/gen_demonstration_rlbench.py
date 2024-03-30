@@ -5,8 +5,8 @@ import zarr
 import numpy as np
 import matplotlib.pyplot as plt
 
-from utils.config import ARGConfig
-from utils.default_config import default_config, dmc_config
+from diffusion_policy_3d.RLBench.utils.config import ARGConfig
+from diffusion_policy_3d.RLBench.utils.default_config import default_config, dmc_config
 # from diffusion_policy_3d.env import MetaWorldEnv
 # from model.algorithm import BAC
 from termcolor import cprint
@@ -17,7 +17,7 @@ import imageio
 # faulthandler.enable()
 
 # RLBench
-from rlbench_utils import get_stored_demo
+from diffusion_policy_3d.RLBench.rlbench_utils import get_stored_demo
 from diffusion_policy_3d.gym_util.mjpc_wrapper import point_cloud_sampling
 import visualizer
 from scipy.spatial.transform import Rotation
@@ -133,7 +133,11 @@ def quaternion_to_discrete_euler(
                 q, resolution, gimble_fix, norm_operation)
             for q in quaternion])
         return out
-    
+
+def discrete_euler_to_quaternion(discrete_euler, resolution):
+    euluer = (discrete_euler * resolution) - 180
+    return Rotation.from_euler('xyz', euluer, degrees=True).as_quat()
+
 def main(args):
     env_name = args.env_name
 

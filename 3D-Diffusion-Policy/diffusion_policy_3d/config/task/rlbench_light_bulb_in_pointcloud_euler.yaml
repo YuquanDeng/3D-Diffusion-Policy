@@ -43,11 +43,12 @@ env_runner:
   eval_episodes: 5
   episode_length: 25
   record_every_n: -1
-  ground_truth: True
+  ground_truth: False
   # device: 0
   headless: True
   
   # Representation config
+  rotation_resolution: 5
   rotation_euler: True
   task_bound:
     default: [-1, -100, 0.78, 100, 100, 100]

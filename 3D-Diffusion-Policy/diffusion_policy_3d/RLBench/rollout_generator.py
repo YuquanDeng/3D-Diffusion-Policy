@@ -21,6 +21,8 @@ from yarr.utils.transition import ReplayTransition
 from yarr.agents.agent import ActResult
 from diffusion_policy_3d.gym_util.mjpc_wrapper import point_cloud_sampling
 import visualizer
+from diffusion_policy_3d.common.pytorch_util import dict_apply
+from diffusion_policy_3d.RLBench.gen_demonstration_rlbench import discrete_euler_to_quaternion
 
 class RolloutGenerator(object):
 
@@ -29,20 +31,22 @@ class RolloutGenerator(object):
                 use_point_crop = True, 
                 rotation_euler = False,
                 task_bound = None,
-                num_points = 512):
+                num_points = 512,
+                rotation_resolution=None):
         self._env_device = env_device
         self.use_point_crop = use_point_crop
         self.rotation_euler = rotation_euler
         self.task_bound = task_bound
         self.num_points = num_points
+        self.rotation_resolution = rotation_resolution
 
         if self.use_point_crop:
             x_min, y_min, z_min, x_max, y_max, z_max = task_bound['default']
             self.min_bound = [x_min, y_min, z_min]
             self.max_bound = [x_max, y_max, z_max]
-
-    def rlbench_obs2diffusion_policy_obs(self, obs_history):
-        point_cloud = obs_history["front_point_cloud"][0].transpose((1, 2, 0)).reshape(-1, 3) # (H, W, 3) -> (H*W, 3)
+    
+    def rlbench_obs2diffusion_policy_obs(self, obs):
+        point_cloud = obs["front_point_cloud"].transpose((1, 2, 0)).reshape(-1, 3) # (H, W, 3) -> (H*W, 3)
         # NOTE: crop background.
         if self.use_point_crop:
             mask = np.all(point_cloud[:, :3] > self.min_bound, axis=1)
@@ -51,19 +55,46 @@ class RolloutGenerator(object):
             mask = np.all(point_cloud[:, :3] < self.max_bound, axis=1)
             point_cloud = point_cloud[mask]   
 
-        point_cloud = point_cloud_sampling(point_cloud, self.num_points, 'fps') # (num_points, 3)
+            point_cloud = point_cloud_sampling(point_cloud, self.num_points, 'fps') # (num_points, 3)
 
-        # # debugging
-        # import pdb; pdb.set_trace()
-        # visualizer.visualize_pointcloud(point_cloud)
+            # # debugging
+            # import pdb; pdb.set_trace()
+            # visualizer.visualize_pointcloud(point_cloud)
+        obs["gripper_open"] = np.expand_dims(obs["gripper_open"], 0) # shape (1,)
+        agent_pos = np.concatenate([obs["gripper_pose"][0:3], obs["gripper_open"]]) # xyz + gripper open
         
-        agent_pos = np.concatenate([obs_history["gripper_pose"][0:3], obs_history["gripper_open"]])
         output_obs_history = {
-            "agent_pos": [agent_pos],
-            "point_cloud": [point_cloud],
-        }
+            "agent_pos": agent_pos,
+            "point_cloud": point_cloud
+        }            
+
+        return output_obs_history        
+
+    def diffusion_policy_action2rlbench_action(self, diffusion_policy_action):
+        RLBENCH_ACTION_DIM = 9
+        WYPT_DIM = 3
+        EULER_DIM = 3
+        QUAT_DIM = 4
+        GRIPPER_OPEN_DIM = 1
         
-        return output_obs_history
+        # TODO: fix select only one action at a time
+        action = diffusion_policy_action[0]
+        
+        if self.rotation_euler:
+            rlbench_action = np.zeros(RLBENCH_ACTION_DIM) # xyz, quat, gripper open, ignore collision
+            
+            rlbench_action[:3] = action[:3] #xyz
+            pred_rot_quat = discrete_euler_to_quaternion(
+                action[3:3+3], self.rotation_resolution
+            )
+            rlbench_action[3:3+4] = pred_rot_quat # quat
+            rlbench_action[7:7+1] = action[6]   # gripper open
+            rlbench_action[8] = 0.0              # ignore collision
+            
+            rlbench_action = ActResult(rlbench_action)
+            return rlbench_action
+        else:
+            raise NotImplementedError
 
     def _get_type(self, x):
         if x.dtype == np.float64:
@@ -84,13 +115,21 @@ class RolloutGenerator(object):
         else:
             obs = env.reset()
         agent.reset()
+        
+        obs = self.rlbench_obs2diffusion_policy_obs(obs)
         obs_history = {k: [np.array(v, dtype=self._get_type(v))] * timesteps for k, v in obs.items()}
         for step in range(episode_length):
-            obs_history = self.rlbench_obs2diffusion_policy_obs(obs_history)
             prepped_data = {k:torch.tensor(np.array([v]), device=self._env_device) for k, v in obs_history.items()}
             if not replay_ground_truth:
-                act_result = agent.act(step_signal.value, prepped_data,
-                                    deterministic=eval)
+                # act_result = agent.act(step_signal.value, prepped_data,
+                #                     deterministic=eval)
+                with torch.no_grad():
+                    action_dict = agent.predict_action(prepped_data)
+                    # device_transfer
+                    np_action_dict = dict_apply(action_dict,
+                                                lambda x: x.detach().to('cpu').numpy())
+                    action = np_action_dict['action'].squeeze(0) # [n_action_steps, action_dim]
+                    act_result = self.diffusion_policy_action2rlbench_action(action)                    
             else:
                 if step >= len(actions):
                     return
@@ -118,6 +157,7 @@ class RolloutGenerator(object):
             obs_and_replay_elems.update(agent_obs_elems)
             obs_and_replay_elems.update(extra_replay_elements)
 
+            transition.observation = self.rlbench_obs2diffusion_policy_obs(transition.observation)
             for k in obs_history.keys():
                 obs_history[k].append(transition.observation[k])
                 obs_history[k].pop(0)
