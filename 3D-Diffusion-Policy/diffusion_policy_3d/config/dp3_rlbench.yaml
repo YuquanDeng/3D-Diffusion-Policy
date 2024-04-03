@@ -8,9 +8,10 @@ task_name: ${task.name}
 shape_meta: ${task.shape_meta}
 exp_name: "debug"
 
-horizon: 4
-n_obs_steps: 2
-n_action_steps: 4
+# adapted from https://github.com/real-stanford/diffusion_policy/blob/main/diffusion_policy/config/train_diffusion_transformer_lowdim_kitchen_workspace.yaml
+horizon: 16
+n_obs_steps: 4
+n_action_steps: 8
 n_latency_steps: 0
 dataset_obs_steps: ${n_obs_steps}
 keypoint_visible_rate: 1.0
