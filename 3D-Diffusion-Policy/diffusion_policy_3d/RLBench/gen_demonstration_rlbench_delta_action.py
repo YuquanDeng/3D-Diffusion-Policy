@@ -38,6 +38,9 @@ TASK_BOUDNS = {
 }
 ROTATION_RESOLUTION = 5 # degree increments per axis
 
+GRIPPER_OPEN_CONTINUOUS_VALUE = 0.085
+GRIPPER_CLOSE_CONTINUOUS_VALUE = 0.
+            
 seed = np.random.randint(0, 100)
 
 # def load_mw_policy(task_name):
@@ -253,8 +256,7 @@ def main(args):
             # visualizer.visualize_pointcloud(point_cloud)
             # import pdb; pdb.set_trace()
 
-            GRIPPER_OPEN_CONTINUOUS_VALUE = 0.085
-            GRIPPER_CLOSE_CONTINUOUS_VALUE = 0.
+
     
             obs_dict = {
                 "image": obs.front_rgb,

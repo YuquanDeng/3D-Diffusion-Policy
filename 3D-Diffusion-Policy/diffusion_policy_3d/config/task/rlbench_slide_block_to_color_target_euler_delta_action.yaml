@@ -41,13 +41,16 @@ env_runner:
   eval_datafolder: /home/nil/manipulation/RVT2/rvt/data/rlbench_data/128x128
   start_episode: 0
   eval_episodes: 2
-  episode_length: 800
+  episode_length: 200
   record_every_n: -1
   ground_truth: False
   # device: 0
   headless: True
   save_video: True
   log_dir: /home/nil/manipulation/3D-Diffusion-Policy/debug
+
+  # action_type specified the type of action prediction: {delta_action, ee_position, delta_vel, etc}
+  action_type: delta_action 
   
   # Representation config
   rotation_resolution: 5

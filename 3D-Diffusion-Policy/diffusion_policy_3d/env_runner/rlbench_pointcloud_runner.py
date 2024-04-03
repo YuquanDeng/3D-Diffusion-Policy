@@ -102,7 +102,8 @@ class RLBenchPointcloudRunner(BasePointcloudRunner):
                  # representation config
                  rotation_euler=False,
                  task_bound=None,
-                 rotation_resolution=None
+                 rotation_resolution=None,
+                 action_type=None
                  ):
         super().__init__(output_dir)
         # self.task_name = task_name
@@ -158,6 +159,7 @@ class RLBenchPointcloudRunner(BasePointcloudRunner):
         self.n_obs_steps = n_obs_steps
         self.n_action_steps = n_action_steps
         self.rotation_resolution = rotation_resolution
+        self.action_type = action_type
 
     @torch.no_grad()
     def run(self, policy: BasePointcloudPolicy):
@@ -237,7 +239,9 @@ class RLBenchPointcloudRunner(BasePointcloudRunner):
             rotation_euler = self.rotation_euler,
             task_bound=self.task_bound,
             num_points=self.num_points,
-            rotation_resolution=self.rotation_resolution
+            rotation_resolution=self.rotation_resolution,
+            action_type=self.action_type,
+            task_name=self.task_name
             )
         stats_accumulator = SimpleAccumulator(eval_video_fps=30)
 
