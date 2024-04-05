@@ -21,7 +21,7 @@ from diffusion_policy_3d.RLBench.rlbench_utils import get_stored_demo
 from diffusion_policy_3d.gym_util.mjpc_wrapper import point_cloud_sampling
 import visualizer
 from scipy.spatial.transform import Rotation
-
+from pyquaternion import Quaternion
 
 """
 This script prepare RLBench data into action representation that match the real
@@ -228,6 +228,7 @@ def main(args):
         # NOTE: placeholder for calculating the first delta action.
         if args.rot_representation == "quat":
             prev_robot_state = np.zeros(8) # xyz(3) + quaternion(4) + gripper state(1)
+            prev_robot_state[6] = 1 # x, y, z, qx, qy, qz, qw, gripper => quaternion with qw=1 means no rotation.
         elif args.rot_representation == "euler":
             prev_robot_state = np.zeros(7) # xyz + euler(3) + gripper state
 
@@ -278,14 +279,43 @@ def main(args):
             # NOTE: change the agent_pos to agent state: xyz, euler angle, and gripper state.
             if args.rot_representation == "quat":
                 obs_robot_state = np.concatenate([obs.gripper_pose, np.array([obs_dict["grip"]])]) # xyz(3) + quaternion(4) + gripper state(1)
+                # TODO: compute delta rotation between two quaternions
+                prev_x, prev_y, prev_z, prev_qx, prev_qy, prev_qz, prev_qw, prev_grip = prev_robot_state
+                curr_x, curr_y, curr_z, curr_qx, curr_qy, curr_qz, curr_qw, curr_grip = obs_robot_state
+                
+                
+                prev_quat = Quaternion(prev_qw, prev_qx, prev_qy, prev_qz)
+                curr_quat = Quaternion(curr_qw, curr_qx, curr_qy, curr_qz)
+                
+                delta_rotation = prev_quat.inverse * curr_quat
+                
+                # sanity check
+                assert np.isclose(delta_rotation.magnitude, 1.0)
+                applied_delta = prev_quat * delta_rotation
+                are_close = np.allclose([applied_delta.x, applied_delta.y, applied_delta.z, applied_delta.w],[curr_quat.x, curr_quat.y, curr_quat.z, curr_quat.w])
+                
+                # print(are_close)
+                delta_action = np.array([
+                    curr_x - prev_x,
+                    curr_y - prev_y,
+                    curr_z - prev_z,
+                    delta_rotation.x, 
+                    delta_rotation.y, 
+                    delta_rotation.z, 
+                    delta_rotation.w,
+                    curr_grip - prev_grip
+                ])
+
+                prev_robot_state = obs_robot_state
             elif args.rot_representation == "euler":
                 obs_robot_state = np.concatenate([obs_dict["agent_pos"], obs_dict["euler"], np.array([obs_dict["grip"]])]) # xyz(3) + euler(3) + gripper state(1) 
+                raise NotImplementedError("The delta rotation implementation for euler angles is incorrect.")
+                # NOTE: action is the delta value between two robot states.
+                THRESHOLD = 0.001
+                delta_action = obs_robot_state - prev_robot_state
+                delta_action[np.abs(delta_action) < THRESHOLD] = 0
+                prev_robot_state = obs_robot_state
 
-            # NOTE: action is the delta value between two robot states.
-            THRESHOLD = 0.001
-            delta_action = obs_robot_state - prev_robot_state
-            delta_action[np.abs(delta_action) < THRESHOLD] = 0
-            prev_robot_state = obs_robot_state
             
             img_arrays_sub.append(obs_img)
             point_cloud_arrays_sub.append(obs_point_cloud)
@@ -314,6 +344,7 @@ def main(args):
             action_arrays_sub = action_arrays_sub[1:] 
             if args.rot_representation == "quat":
                 action_arrays_sub.append(np.zeros(8))
+                prev_robot_state[6] = 1 # x, y, z, qx, qy, qz, qw, gripper => quaternion with qw=1 means no rotation.
             elif args.rot_representation == "euler":
                 action_arrays_sub.append(np.zeros(7))
             
