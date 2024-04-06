@@ -24,6 +24,7 @@ import visualizer
 from diffusion_policy_3d.common.pytorch_util import dict_apply
 from diffusion_policy_3d.RLBench.gen_demonstration_rlbench import discrete_euler_to_quaternion
 from diffusion_policy_3d.RLBench.gen_demonstration_rlbench_delta_action import quaternion_to_discrete_euler, GRIPPER_OPEN_CONTINUOUS_VALUE, GRIPPER_CLOSE_CONTINUOUS_VALUE
+from pyquaternion import Quaternion
 
 def are_floats_equal(a, b, epsilon=1e-9):
     return abs(a - b) < epsilon
@@ -72,12 +73,13 @@ class RolloutGenerator(object):
             # visualizer.visualize_pointcloud(point_cloud)
             
             # (2) agent_pos
-            euler = np.deg2rad(quaternion_to_discrete_euler(obs["gripper_pose"][3:], resolution=self.rotation_resolution))
             obs["grip"] = GRIPPER_OPEN_CONTINUOUS_VALUE if bool(obs["gripper_open"]) else GRIPPER_CLOSE_CONTINUOUS_VALUE
+            euler = np.deg2rad(quaternion_to_discrete_euler(obs["gripper_pose"][3:], resolution=self.rotation_resolution))
             
             if self.rotation_euler:
                 agent_pos = np.concatenate([obs["gripper_pose"][0:3], euler, np.array([obs["grip"]])]) # xyz + gripper open
             else:
+                # TODO: how is the key agent_pos affect the policy.
                 agent_pos = np.concatenate([obs["gripper_pose"], np.array([obs["grip"]])])
                 
             output_obs_history = {
@@ -123,20 +125,25 @@ class RolloutGenerator(object):
                 if np.abs(delta_gripper_open_cont) < 0.0001:
                     action[-1] = 0.0
                 
-                curr_obs = prev_obs + action # xyz, euler, gripper change
-                prev_obs = curr_obs # update prev_obs
-                
-                rlbench_action = np.zeros(9) # xyz, quat, gripper open, ignore collision
-                rlbench_action[:3] = curr_obs[:3] # xyz
-                pred_rot_quat = discrete_euler_to_quaternion(
-                    curr_obs[3:3+3], self.rotation_resolution
-                )
-                rlbench_action[3:3+4] = pred_rot_quat # quat
-                rlbench_action[7:7+1] = 1.0 if are_floats_equal(curr_obs[-1], GRIPPER_OPEN_CONTINUOUS_VALUE)  else 0.0 # gripper open
-                rlbench_action[8] = 0.0              # ignore collision
+                # TODO problematic
+                if not self.rotation_euler:
+                    x, y, z, qx, qy, qz, qw, grip = prev_obs
+                    a_x, a_y, a_z, a_qx, a_qy, a_qz, a_qw, a_grip = action
+                    new_rot = Quaternion(
+                        a_qw, a_qx, a_qy, a_qz) * Quaternion(qw, qx, qy, qz)
+                    qw, qx, qy, qz = list(new_rot)
+                    curr_obs = np.array([a_x + x, a_y + y, a_z + z] + [qx, qy, qz, qw] + [grip+a_grip])
+                    prev_obs = curr_obs # update prev_obs
+                    
+                    rlbench_action = np.zeros(9) # xyz, quat, gripper open, ignore collision
+                    rlbench_action[:7] = curr_obs[:7] # xyz + quaternion
+                    rlbench_action[7:7+1] = 1.0 if are_floats_equal(curr_obs[-1], GRIPPER_OPEN_CONTINUOUS_VALUE)  else 0.0 # gripper open
+                    rlbench_action[8] = 0.0              # ignore collision
 
-                rlbench_action = ActResult(rlbench_action)
-                rlbench_action_list.append(rlbench_action)
+                    rlbench_action = ActResult(rlbench_action)
+                    rlbench_action_list.append(rlbench_action)
+                else:
+                    raise NotImplementedError
             return rlbench_action_list
         else:
             RLBENCH_ACTION_DIM = 9
@@ -194,6 +201,7 @@ class RolloutGenerator(object):
                 # act_result = agent.act(step_signal.value, prepped_data,
                 #                     deterministic=eval)
                 with torch.no_grad():
+                    # import pdb;pdb.set_trace()
                     action_dict = agent.predict_action(prepped_data)
                     # device_transfer
                     np_action_dict = dict_apply(action_dict,
