@@ -54,7 +54,7 @@ env_runner:
   
   # Representation config
   rotation_resolution: 5
-  rotation_euler: True
+  rotation_euler: False
   task_bound:
     default: [-1, -100, 0.78, 100, 100, 100]
     remove_scene: [-1, -100, 0, 100, 100, 100]

@@ -79,7 +79,7 @@ class RolloutGenerator(object):
             if self.rotation_euler:
                 agent_pos = np.concatenate([obs["gripper_pose"][0:3], euler, np.array([obs["grip"]])]) # xyz + gripper open
             else:
-                # TODO: how is the key agent_pos affect the policy.
+                assert np.isclose(np.linalg.norm(obs["gripper_pose"][3:3+4]), 1.0)
                 agent_pos = np.concatenate([obs["gripper_pose"], np.array([obs["grip"]])])
                 
             output_obs_history = {
@@ -116,7 +116,8 @@ class RolloutGenerator(object):
         if self.action_type == "delta_action":
             rlbench_action_list = []
             end_action_idx = (len(diffusion_policy_action) // 2) # execute half of the prediction actions.
-            prev_obs = obs_history["agent_pos"][-1] # shape xyz, euler, continuous_gripper_state
+
+            prev_obs = obs_history["agent_pos"][-1] # shape xyz, quaternion, continuous_gripper_state
             
             # NOTE: this code does not handle quat!
             for action_idx in range(end_action_idx):
@@ -127,11 +128,15 @@ class RolloutGenerator(object):
                 
                 # TODO problematic
                 if not self.rotation_euler:
+                    # adapted from https://github.com/stepjam/RLBench/blob/7c3f425f4a0b6b5ce001ba7246354eb3c70555be/rlbench/action_modes/arm_action_modes.py#L26
                     x, y, z, qx, qy, qz, qw, grip = prev_obs
                     a_x, a_y, a_z, a_qx, a_qy, a_qz, a_qw, a_grip = action
                     new_rot = Quaternion(
                         a_qw, a_qx, a_qy, a_qz) * Quaternion(qw, qx, qy, qz)
-                    qw, qx, qy, qz = list(new_rot)
+                    
+                    qw, qx, qy, qz = np.array(list(new_rot)) / np.linalg.norm(np.array(list(new_rot)))
+                    # assert np.isclose(new_rot.magnitude, 1.0), f"not unit quaternion {new_rot.magnitude}"
+                    assert np.isclose(np.linalg.norm(np.array([qx, qy, qz, qw])), 1.0)
                     curr_obs = np.array([a_x + x, a_y + y, a_z + z] + [qx, qy, qz, qw] + [grip+a_grip])
                     prev_obs = curr_obs # update prev_obs
                     
@@ -196,6 +201,7 @@ class RolloutGenerator(object):
         obs = self.rlbench_obs2diffusion_policy_obs(obs)
         obs_history = {k: [np.array(v, dtype=self._get_type(v))] * timesteps for k, v in obs.items()}
         for step in range(episode_length):
+            # device transfer
             prepped_data = {k:torch.tensor(np.array([v]), device=self._env_device) for k, v in obs_history.items()}
             if not replay_ground_truth:
                 # act_result = agent.act(step_signal.value, prepped_data,
@@ -239,6 +245,7 @@ class RolloutGenerator(object):
             obs_and_replay_elems.update(agent_obs_elems)
             obs_and_replay_elems.update(extra_replay_elements)
 
+            # map rlbench obs to diffusion policy obs
             transition.observation = self.rlbench_obs2diffusion_policy_obs(transition.observation)
             for k in obs_history.keys():
                 obs_history[k].append(transition.observation[k])
