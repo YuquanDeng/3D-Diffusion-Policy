@@ -210,12 +210,15 @@ class LangDP3Encoder(nn.Module):
                  pointcloud_encoder_cfg=None,
                  use_pc_color=False,
                  pointnet_type='pointnet',
+                 lang_emb_dim=1024,
+                 lang_output_dim=64
                  ):
         super().__init__()
         self.imagination_key = 'imagin_robot'
         self.state_key = 'agent_pos'
         self.point_cloud_key = 'point_cloud'
         self.rgb_image_key = 'image'
+        self.lang_key = 'lang_goal_embed'
         self.n_output_channels = out_channel
         
         self.use_imagined_robot = self.imagination_key in observation_space.keys()
@@ -226,11 +229,9 @@ class LangDP3Encoder(nn.Module):
         else:
             self.imagination_shape = None
             
-        
-        
-        cprint(f"[DP3Encoder] point cloud shape: {self.point_cloud_shape}", "yellow")
-        cprint(f"[DP3Encoder] state shape: {self.state_shape}", "yellow")
-        cprint(f"[DP3Encoder] imagination point shape: {self.imagination_shape}", "yellow")
+        cprint(f"[LangDP3Encoder] point cloud shape: {self.point_cloud_shape}", "yellow")
+        cprint(f"[LangDP3Encoder] state shape: {self.state_shape}", "yellow")
+        cprint(f"[LangDP3Encoder] imagination point shape: {self.imagination_shape}", "yellow")
         
 
         self.use_pc_color = use_pc_color
@@ -256,11 +257,23 @@ class LangDP3Encoder(nn.Module):
 
         self.n_output_channels  += output_dim
         self.state_mlp = nn.Sequential(*create_mlp(self.state_shape[0], output_dim, net_arch, state_mlp_activation_fn))
+        
+        # lang encoder 
+        self.lang_preprocess = nn.Linear(lang_emb_dim, lang_output_dim)
+        self.n_output_channels  += lang_output_dim
+        # learnable position encoding
+        self.pos_encoding = nn.Parameter(
+            torch.randn(
+                1,
+                lang_emb_dim,
+            )
+        )
 
-        cprint(f"[DP3Encoder] output dim: {self.n_output_channels}", "red")
+        cprint(f"[LangDP3Encoder] output dim: {self.n_output_channels}", "red")
 
 
     def forward(self, observations: Dict) -> torch.Tensor:
+        
         points = observations[self.point_cloud_key]
         assert len(points.shape) == 3, cprint(f"point cloud shape: {points.shape}, length should be 3", "red")
         if self.use_imagined_robot:
@@ -273,7 +286,16 @@ class LangDP3Encoder(nn.Module):
             
         state = observations[self.state_key]
         state_feat = self.state_mlp(state)  # B * 64
-        final_feat = torch.cat([pn_feat, state_feat], dim=-1)
+        
+        # add lang
+        # import pdb;pdb.set_trace()
+        lang_goal_embed = observations[self.lang_key]
+        lang_goal_embed += self.pos_encoding 
+        lang_feat = self.lang_preprocess(lang_goal_embed) # B * lang_embed_dim 
+        
+        
+        # final_feat = torch.cat([pn_feat, state_feat], dim=-1)
+        final_feat = torch.cat([pn_feat, state_feat, lang_feat], dim=-1)
         return final_feat
 
 

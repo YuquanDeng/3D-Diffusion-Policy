@@ -1,0 +1,75 @@
+name: slide_block_to_color_target
+
+task_name: ${name}
+
+shape_meta: &shape_meta
+  obs:
+    point_cloud:
+      shape: [1024, 6]
+      type: point_cloud
+    agent_pos:
+      shape: [8]
+      type: low_dim
+  action:
+    shape: [8]
+
+env_runner:
+  _target_: diffusion_policy_3d.env_runner.rlbench_pointcloud_runner.RLBenchPointcloudRunner
+  # eval_episodes: 3 # for debugging
+  n_obs_steps: ${n_obs_steps}
+  n_action_steps: ${n_action_steps}
+  # fps: 10
+  # n_envs: null
+  # n_train: null
+  # n_test: null
+  task_name: 
+    - ${task_name}
+  device: ${training.device}
+  use_point_crop: ${policy.use_point_crop}
+  num_points: 1024
+  # eval_datafolder: /home/nil/manipulation/RVT2/rvt/data/val
+  # eval_datafolder: /home/nil/manipulation/RVT2/rvt/data/rlbench_data/128x128 # FOR DEBUGGING!
+  # episode_length: 800    # maximum control steps allowed for each episode
+  # headless: True
+  # record_every_n: -1 
+  # cameras: [front, left_shoulder, right_shoulder, wrist]
+  # save_video: True
+
+  # RLBench config
+  tasks_to_eval: slide_block_to_color_target
+  cameras: [front, left_shoulder, right_shoulder, wrist]
+  eval_datafolder: /home/nil/manipulation/RVT2/rvt/data/rlbench_data/128x128
+  start_episode: 0
+  eval_episodes: 2
+  episode_length: 200
+  record_every_n: -1
+  ground_truth: False
+  # device: 0
+  headless: True
+  save_video: True
+  log_dir: /home/nil/manipulation/3D-Diffusion-Policy/debug
+
+  # action_type specified the type of action prediction: {delta_action, ee_position, delta_vel, etc}
+  action_type: delta_action 
+  
+  # Representation config
+  rotation_resolution: 5
+  rotation_euler: False
+  task_bound:
+    default: [-1, -100, 0.78, 100, 100, 100]
+    remove_scene: [-1, -100, 0, 100, 100, 100]
+    remove_table': [-1, -100, 0.6, 100, 100, 100]
+    slide_block_to_color_target: [-0.4, -0.4, 0, 100, 0.4, 100]
+
+
+dataset:
+  # _target_: diffusion_policy_3d.dataset.metaworld_pointcloud_dataset.MetaworldPointcloudDataset
+  _target_: diffusion_policy_3d.dataset.rlbench_pointcloud_dataset.RLBenchPointcloudDataset
+  zarr_path: data/rlbench_slide_block_to_color_target_lang_quat_delta_action_expert.zarr
+  use_lang: True
+  horizon: ${horizon}
+  pad_before: ${eval:'${n_obs_steps}-1'}
+  pad_after: ${eval:'${n_action_steps}-1'}
+  seed: 42
+  val_ratio: 0.02
+  max_train_episodes: 90

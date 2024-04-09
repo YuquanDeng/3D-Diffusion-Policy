@@ -18,10 +18,16 @@ class RLBenchPointcloudDataset(BasePointcloudDataset):
             seed=42,
             val_ratio=0.0,
             max_train_episodes=None,
+            use_lang=False
             ):
         super().__init__()
-        self.replay_buffer = ReplayBuffer.copy_from_path(
-            zarr_path, keys=['state', 'action', 'point_cloud'])
+        self.use_lang = use_lang
+        if use_lang:
+            self.replay_buffer = ReplayBuffer.copy_from_path(
+                zarr_path, keys=['state', 'action', 'point_cloud', 'lang_goal_embed'])
+        else:
+            self.replay_buffer = ReplayBuffer.copy_from_path(
+                zarr_path, keys=['state', 'action', 'point_cloud'])
         val_mask = get_val_mask(
             n_episodes=self.replay_buffer.n_episodes, 
             val_ratio=val_ratio,
@@ -56,11 +62,19 @@ class RLBenchPointcloudDataset(BasePointcloudDataset):
         return val_set
 
     def get_normalizer(self, mode='limits', **kwargs):
-        data = {
-            'action': self.replay_buffer['action'],
-            'agent_pos': self.replay_buffer['state'][...,:],
-            'point_cloud': self.replay_buffer['point_cloud'],
-        }
+        if self.use_lang:
+            data = {
+                'action': self.replay_buffer['action'],
+                'agent_pos': self.replay_buffer['state'][...,:],
+                'point_cloud': self.replay_buffer['point_cloud'],
+                'lang_goal_embed': self.replay_buffer['lang_goal_embed']
+            }
+        else:
+            data = {
+                'action': self.replay_buffer['action'],
+                'agent_pos': self.replay_buffer['state'][...,:],
+                'point_cloud': self.replay_buffer['point_cloud'],
+            }           
         normalizer = LinearNormalizer()
         normalizer.fit(data=data, last_n_dims=1, mode=mode, **kwargs)
         # normalizer['point_cloud'] = SingleFieldLinearNormalizer.create_identity()
@@ -73,6 +87,9 @@ class RLBenchPointcloudDataset(BasePointcloudDataset):
     def _sample_to_data(self, sample):
         agent_pos = sample['state'][:,].astype(np.float32) # (agent_posx2, block_posex3)
         point_cloud = sample['point_cloud'][:,].astype(np.float32) # (T, 1024, 3)
+        lang_goal_embed = None
+        if self.use_lang:
+            lang_goal_embed = sample['lang_goal_embed'][:,].astype(np.float32) # (T, lang_embed_dim) 
         # point_cloud_robot = sample['point_cloud_robot'][:,].astype(np.float32) # (T, 1024, 3)
 
         data = {
@@ -80,6 +97,7 @@ class RLBenchPointcloudDataset(BasePointcloudDataset):
                 'point_cloud': point_cloud, # T, 1024, 3
                 # 'point_cloud_robot': point_cloud_robot, # T, 1024, 3
                 'agent_pos': agent_pos, # T, D_pos
+                'lang_goal_embed': lang_goal_embed # None or (T, lang_embed_dim)
             },
             'action': sample['action'].astype(np.float32) # T, D_action
         }

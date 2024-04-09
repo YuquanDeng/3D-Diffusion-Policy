@@ -17,7 +17,7 @@ from diffusion_policy_3d.model.diffusion.mask_generator import LowdimMaskGenerat
 import diffusion_policy_3d.model.vision.crop_randomizer as dmvc
 from diffusion_policy_3d.common.pytorch_util import dict_apply, replace_submodules
 from diffusion_policy_3d.common.model_util import print_params
-# from diffusion_policy_3d.model.vision_3d.pointnet_extractor import DP3Encoder
+from diffusion_policy_3d.model.vision_3d.pointnet_extractor import DP3Encoder
 from diffusion_policy_3d.model.vision_3d.lang_pointnet_extractor import LangDP3Encoder
 
 # from diffusion_policy_3d.model.vision_3d import loss as vision3d_loss
@@ -46,6 +46,10 @@ class LangDiffusionUnetHybridPointcloudPolicy(BasePointcloudPolicy):
             pointnet_type="pointnet",
             se3_augmentation_cfg=None,
             pointcloud_encoder_cfg=None,
+            # lang
+            use_lang=True,
+            lang_output_dim=64,
+            lang_emb_dim=1024,
             # parameters passed to step
             **kwargs):
         super().__init__()
@@ -65,14 +69,25 @@ class LangDiffusionUnetHybridPointcloudPolicy(BasePointcloudPolicy):
         obs_shape_meta = shape_meta['obs']
         obs_dict = dict_apply(obs_shape_meta, lambda x: x['shape'])
 
-
-        obs_encoder = LangDP3Encoder(observation_space=obs_dict,
-                                                   img_crop_shape=crop_shape,
-                                                out_channel=encoder_output_dim,
-                                                pointcloud_encoder_cfg=pointcloud_encoder_cfg,
-                                                use_pc_color=use_pc_color,
-                                                pointnet_type=pointnet_type,
-                                                )
+        self.use_lang = use_lang
+        if self.use_lang:
+            obs_encoder = LangDP3Encoder(observation_space=obs_dict,
+                                                    img_crop_shape=crop_shape,
+                                                    out_channel=encoder_output_dim,
+                                                    pointcloud_encoder_cfg=pointcloud_encoder_cfg,
+                                                    use_pc_color=use_pc_color,
+                                                    pointnet_type=pointnet_type,
+                                                    lang_emb_dim=lang_emb_dim,
+                                                    lang_output_dim=lang_output_dim
+                                                    )
+        else:
+            obs_encoder = DP3Encoder(observation_space=obs_dict,
+                                            img_crop_shape=crop_shape,
+                                            out_channel=encoder_output_dim,
+                                            pointcloud_encoder_cfg=pointcloud_encoder_cfg,
+                                            use_pc_color=use_pc_color,
+                                            pointnet_type=pointnet_type,
+                                            )
 
         # create diffusion model
         obs_feature_dim = obs_encoder.output_shape()
@@ -88,8 +103,9 @@ class LangDiffusionUnetHybridPointcloudPolicy(BasePointcloudPolicy):
 
         self.use_pc_color = use_pc_color
         self.pointnet_type = pointnet_type
-        cprint(f"[DiffusionUnetHybridPointcloudPolicy] use_pc_color: {self.use_pc_color}", "yellow")
-        cprint(f"[DiffusionUnetHybridPointcloudPolicy] pointnet_type: {self.pointnet_type}", "yellow")
+        cprint(f"[LangDiffusionUnetHybridPointcloudPolicy] use_lang: {self.use_lang}", "yellow")
+        cprint(f"[LangDiffusionUnetHybridPointcloudPolicy] use_pc_color: {self.use_pc_color}", "yellow")
+        cprint(f"[LangDiffusionUnetHybridPointcloudPolicy] pointnet_type: {self.pointnet_type}", "yellow")
         self.se3_augmentation_cfg = se3_augmentation_cfg
         if self.se3_augmentation_cfg.use_aug:
             self.se3_aug = create_se3_augmentation(self.se3_augmentation_cfg)
@@ -319,6 +335,7 @@ class LangDiffusionUnetHybridPointcloudPolicy(BasePointcloudPolicy):
         else:
             # reshape B, T, ... to B*T
             this_nobs = dict_apply(nobs, lambda x: x.reshape(-1, *x.shape[2:]))
+            
             nobs_features = self.obs_encoder(this_nobs)
             # reshape back to B, T, Do
             nobs_features = nobs_features.reshape(batch_size, horizon, -1)
