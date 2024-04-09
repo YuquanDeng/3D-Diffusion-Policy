@@ -61,15 +61,18 @@ env_runner:
     remove_table': [-1, -100, 0.6, 100, 100, 100]
     slide_block_to_color_target: [-0.4, -0.4, 0, 100, 0.4, 100]
 
+  # lang
+  use_lang: ${policy.use_lang}
 
 dataset:
   # _target_: diffusion_policy_3d.dataset.metaworld_pointcloud_dataset.MetaworldPointcloudDataset
   _target_: diffusion_policy_3d.dataset.rlbench_pointcloud_dataset.RLBenchPointcloudDataset
   zarr_path: data/rlbench_slide_block_to_color_target_lang_quat_delta_action_expert.zarr
-  use_lang: True
   horizon: ${horizon}
   pad_before: ${eval:'${n_obs_steps}-1'}
   pad_after: ${eval:'${n_action_steps}-1'}
   seed: 42
   val_ratio: 0.02
   max_train_episodes: 90
+  # lang
+  use_lang: ${policy.use_lang}

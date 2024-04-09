@@ -25,7 +25,49 @@ from pyrep.const import RenderMode
 from pyrep.errors import IKError, ConfigurationPathError
 from pyrep.objects import VisionSensor, Dummy
 
+# Lang
+import clip
+import torch
+from diffusion_policy_3d.CLIP.clip import build_model, load_clip, tokenize
+from diffusion_policy_3d.CLIP.clip_utils import _clip_encode_text
 
+# adapt from YARR/yarr/env/rlbench_env.py
+ROBOT_STATE_KEYS = ['joint_velocities', 'joint_positions', 'joint_forces',
+                        'gripper_open', 'gripper_pose',
+                        'gripper_joint_positions', 'gripper_touch_forces',
+                        'task_low_dim_state', 'misc']
+
+def _extract_obs(obs: Observation, channels_last: bool, observation_config):
+    obs_dict = vars(obs)
+    obs_dict = {k: v for k, v in obs_dict.items() if v is not None}
+    robot_state = obs.get_low_dim_data()
+    # Remove all of the individual state elements
+    obs_dict = {k: v for k, v in obs_dict.items()
+                if k not in ROBOT_STATE_KEYS}
+    if not channels_last:
+        # Swap channels from last dim to 1st dim
+        obs_dict = {k: np.transpose(
+            v, [2, 0, 1]) if v.ndim == 3 else np.expand_dims(v, 0)
+                    for k, v in obs_dict.items()}
+    else:
+        # Add extra dim to depth data
+        obs_dict = {k: v if v.ndim == 3 else np.expand_dims(v, -1)
+                    for k, v in obs_dict.items()}
+    obs_dict['low_dim_state'] = np.array(robot_state, dtype=np.float32)
+    obs_dict['ignore_collisions'] = np.array([obs.ignore_collisions], dtype=np.float32)
+    for (k, v) in [(k, v) for k, v in obs_dict.items() if 'point_cloud' in k]:
+        obs_dict[k] = v.astype(np.float32)
+
+    for config, name in [
+        (observation_config.left_shoulder_camera, 'left_shoulder'),
+        (observation_config.right_shoulder_camera, 'right_shoulder'),
+        (observation_config.front_camera, 'front'),
+        (observation_config.wrist_camera, 'wrist'),
+        (observation_config.overhead_camera, 'overhead')]:
+        if config.point_cloud:
+            obs_dict['%s_camera_extrinsics' % name] = obs.misc['%s_camera_extrinsics' % name]
+            obs_dict['%s_camera_intrinsics' % name] = obs.misc['%s_camera_intrinsics' % name]
+    return obs_dict
 
 class CustomRLBenchEnv(RLBenchEnv):
 
@@ -222,7 +264,8 @@ class CustomMultiTaskRLBenchEnv(MultiTaskRLBenchEnv):
                  swap_task_every: int = 1,
                  time_in_state: bool = False,
                  include_lang_goal_in_obs: bool = False,
-                 record_every_n: int = 20):
+                 record_every_n: int = 20, 
+                 device=None):
         super(CustomMultiTaskRLBenchEnv, self).__init__(
             task_classes, observation_config, action_mode, dataset_root,
             channels_last, headless=headless, swap_task_every=swap_task_every,
@@ -243,6 +286,13 @@ class CustomMultiTaskRLBenchEnv(MultiTaskRLBenchEnv):
             'InvalidActionError': 0,
         }
         self._last_exception = None
+        
+        # Load pre-trained language model
+        if self._include_lang_goal_in_obs:
+            self.device = device
+            model, _ = load_clip("RN50", self.device , jit=False)
+            self.clip_rn50 = build_model(model.state_dict()).to(self.device )
+            del model
 
     @property
     def observation_elements(self) -> List[ObservationElement]:
@@ -267,7 +317,17 @@ class CustomMultiTaskRLBenchEnv(MultiTaskRLBenchEnv):
             obs.gripper_joint_positions = np.clip(
                 obs.gripper_joint_positions, 0., 0.04)
 
-        obs_dict = super(CustomMultiTaskRLBenchEnv, self).extract_obs(obs)
+        # obs_dict = super(CustomMultiTaskRLBenchEnv, self).extract_obs(obs)
+        extracted_obs = _extract_obs(obs, self._channels_last, self._observation_config)
+        # extract language embedding
+        if self._include_lang_goal_in_obs:
+            tokens = clip.tokenize([self._lang_goal]).numpy()
+            token_tensor = torch.from_numpy(tokens).to(self.device)
+            with torch.no_grad():
+                lang_feats, lang_embs = _clip_encode_text(self.clip_rn50, token_tensor)
+            extracted_obs["lang_goal_embed"] = lang_feats[0].float().detach().cpu().numpy() # shape (1024,)    
+            extracted_obs["lang_goal"] = self._lang_goal    
+        obs_dict = extracted_obs
 
         if self._time_in_state:
             time = (1. - ((self._i if t is None else t) / float(
@@ -404,7 +464,7 @@ class CustomMultiTaskRLBenchEnv(MultiTaskRLBenchEnv):
 class CustomMultiTaskRLBenchEnv2(CustomMultiTaskRLBenchEnv):
 
     def __init__(self, *args, **kwargs):
-        super(CustomMultiTaskRLBenchEnv2, self).__init__(*args, **kwargs)
+        super(CustomMultiTaskRLBenchEnv2, self).__init__(*args, **kwargs)        
 
     def reset(self) -> dict:
         super().reset()

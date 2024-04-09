@@ -38,7 +38,8 @@ class RolloutGenerator(object):
                 num_points = 512,
                 rotation_resolution=None, 
                 action_type=None,
-                task_name=None):
+                task_name=None,
+                use_lang=False):
         self._env_device = env_device
         self.use_point_crop = use_point_crop
         self.rotation_euler = rotation_euler
@@ -52,6 +53,9 @@ class RolloutGenerator(object):
             x_min, y_min, z_min, x_max, y_max, z_max = task_bound[self.task_name]
             self.min_bound = [x_min, y_min, z_min]
             self.max_bound = [x_max, y_max, z_max]
+        
+        # lang
+        self.use_lang = use_lang
     
     def rlbench_obs2diffusion_policy_obs(self, obs):
         if self.action_type == "delta_action":
@@ -191,6 +195,7 @@ class RolloutGenerator(object):
 
         if eval:
             obs = env.reset_to_demo(eval_demo_seed)
+            import pdb;pdb.set_trace()
             # get ground-truth action sequence
             if replay_ground_truth:
                 actions = env.get_ground_truth_action(eval_demo_seed)
