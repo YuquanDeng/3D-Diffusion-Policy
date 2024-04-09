@@ -18,12 +18,16 @@ keypoint_visible_rate: 1.0
 obs_as_global_cond: True
 
 policy:
-  _target_: diffusion_policy_3d.policy.diffusion_unet_hybrid_pointcloud_policy.DiffusionUnetHybridPointcloudPolicy
+  _target_: diffusion_policy_3d.policy.diffusion_lang_unet_hybrid_pointcloud_policy.LangDiffusionUnetHybridPointcloudPolicy
   use_point_crop: true
   condition_type: film
   use_down_condition: true
   use_mid_condition: true
   use_up_condition: true
+
+  # lang
+  use_lang: true
+  lang_output_dim: 64
   
   diffusion_step_embed_dim: 128
   down_dims:
