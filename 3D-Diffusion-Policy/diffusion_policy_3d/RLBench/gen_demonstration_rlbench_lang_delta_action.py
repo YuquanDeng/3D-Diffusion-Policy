@@ -4,6 +4,7 @@ import os
 import zarr
 import numpy as np
 import matplotlib.pyplot as plt
+import pickle
 
 from diffusion_policy_3d.RLBench.utils.config import ARGConfig
 from diffusion_policy_3d.RLBench.utils.default_config import default_config, dmc_config
@@ -22,6 +23,12 @@ from diffusion_policy_3d.gym_util.mjpc_wrapper import point_cloud_sampling
 import visualizer
 from scipy.spatial.transform import Rotation
 from pyquaternion import Quaternion
+
+# Lang
+import clip
+import torch
+from diffusion_policy_3d.CLIP.clip import build_model, load_clip, tokenize
+from diffusion_policy_3d.CLIP.clip_utils import _clip_encode_text
 
 """
 This script prepare RLBench data into action representation that match the real
@@ -152,7 +159,7 @@ def discrete_euler_to_quaternion(discrete_euler, resolution):
 def main(args):
     env_name = args.env_name
 
-    save_dir = os.path.join(args.save_dir, 'rlbench_'+args.env_name+f'_{args.rot_representation}'+'_delta_action_expert.zarr')
+    save_dir = os.path.join(args.save_dir, 'rlbench_'+args.env_name+f'_lang'+f'_{args.rot_representation}'+'_delta_action_expert.zarr')
     if os.path.exists(save_dir):
         cprint('Data already exists at {}'.format(save_dir), 'red')
         cprint("If you want to overwrite, delete the existing directory first.", "red")
@@ -172,15 +179,6 @@ def main(args):
         min_bound = [x_min, y_min, z_min]
         max_bound = [x_max, y_max, z_max]
 
-    # e = MetaWorldEnv(env_name, is_state_based=True, device="cuda:0", use_point_crop=use_point_crop, num_points=num_points)
-    
-    # create policy
-    # policy_path = f"expert_ckpt/{env_name}.torch"
-    # print("Policy path: ", policy_path)
-    # config.update({"device": "3"})
-    # pi = BAC(e.observation_space.shape[0], e.action_space, config)
-    # pi.load_checkpoint(policy_path, evaluate=True)
-
     num_episodes = args.num_episodes
     cprint(f"Number of episodes : {num_episodes}", "yellow")
     
@@ -192,7 +190,8 @@ def main(args):
     state_arrays = []
     action_arrays = []
     episode_ends_arrays = []
-    
+    lang_emb_arrays = []
+    lang_goal_arrays = []
     
     episode_idx = 0
 
@@ -200,19 +199,15 @@ def main(args):
     EPISODES_FOLDER = f"{env_name}/all_variations/episodes"
     data_path = os.path.join(args.root_dir, EPISODES_FOLDER)
     
-
-
-    # mw_policy = load_mw_policy(env_name)
-    # cprint(f"Using script policy: {args.use_script_policy}", "yellow")
-
+    # Load pre-trained language model
+    device = torch.device("cuda:0") if args.device == "0" else torch.device("cpu")
+    model, _ = load_clip("RN50", device, jit=False)
+    clip_rn50 = build_model(model.state_dict()).to(device)
+    del model
+    
+    
     # loop over episodes
     while episode_idx < num_episodes:
-        # raw_state = e.reset()
-
-        # obs_dict = e.get_visual_obs()
-
-        # done = False
-        
         ep_reward = 0.
         ep_success = False
         ep_success_times = 0
@@ -223,6 +218,8 @@ def main(args):
         depth_arrays_sub = []
         state_arrays_sub = []
         action_arrays_sub = []
+        lang_emb_arrays_sub = []
+        lang_goal_arrays_sub = []
         total_count_sub = 0
         
         # NOTE: placeholder for calculating the first delta action.
@@ -235,6 +232,24 @@ def main(args):
         # NOTE: demo type=rlbench.demo.demo; Details in https://github.com/stepjam/RLBench/blob/master/rlbench/demo.py
         #       obs type=rlbenc.backend.observation.Observation; Details in https://github.com/stepjam/RLBench/blob/master/rlbench/backend/observation.py
         demo = get_stored_demo(data_path=data_path, index=episode_idx)
+        
+        # get language goal from disk
+        varation_descs_pkl_file = os.path.join(
+            data_path, f'episode{episode_idx}', 'variation_descriptions.pkl'
+        )
+        with open(varation_descs_pkl_file, "rb") as f:
+            descriptions = pickle.load(f)
+        description = descriptions[0]
+        cprint(f"lang goal: {description}", "white")
+        
+        # extract language embedding
+        tokens = clip.tokenize([description]).numpy()
+        token_tensor = torch.from_numpy(tokens).to(device)
+        with torch.no_grad():
+            lang_feats, lang_embs = _clip_encode_text(clip_rn50, token_tensor)
+        lang_goal_embs = lang_feats[0].float().detach().cpu().numpy() # shape (1024,)
+        
+
         for idx in range(len(demo)):
             # NOTE: only use front camera information, add rgb information as well.
             obs = demo[idx]
@@ -267,7 +282,8 @@ def main(args):
                 # NOTE: change the gripper state to continuous value.
                 "grip": GRIPPER_OPEN_CONTINUOUS_VALUE if bool(obs.gripper_open) else GRIPPER_CLOSE_CONTINUOUS_VALUE,
                 "quat": obs.gripper_pose[3:],
-                "euler": np.deg2rad(quaternion_to_discrete_euler(obs.gripper_pose[3:], resolution=ROTATION_RESOLUTION))
+                "euler": np.deg2rad(quaternion_to_discrete_euler(obs.gripper_pose[3:], resolution=ROTATION_RESOLUTION)),
+                "lang_goal_emb": lang_goal_embs
             }
 
             total_count_sub += 1
@@ -323,6 +339,8 @@ def main(args):
             
             action_arrays_sub.append(delta_action)
             state_arrays_sub.append(obs_robot_state)
+            lang_emb_arrays_sub.append(lang_goal_embs)
+            lang_goal_arrays_sub.append(description)
 
 
             terminal = idx == len(demo) - 1
@@ -355,6 +373,9 @@ def main(args):
             depth_arrays.extend(copy.deepcopy(depth_arrays_sub))
             state_arrays.extend(copy.deepcopy(state_arrays_sub))
             action_arrays.extend(copy.deepcopy(action_arrays_sub))
+            lang_emb_arrays.extend(copy.deepcopy(lang_emb_arrays_sub))
+            lang_goal_arrays.extend(copy.deepcopy(lang_goal_arrays_sub))
+            
             cprint('Episode: {}, Reward: {}, Success Times: {}'.format(episode_idx, ep_reward, ep_success_times), 'green')
             episode_idx += 1
 
@@ -375,19 +396,24 @@ def main(args):
     depth_arrays = np.stack(depth_arrays, axis=0)
     action_arrays = np.stack(action_arrays, axis=0)
     episode_ends_arrays = np.array(episode_ends_arrays)
-
+    lang_emb_arrays = np.stack(lang_emb_arrays, axis=0)
+    lang_goal_arrays = lang_goal_arrays
+    # import pdb;pdb.set_trace()
+    
     compressor = zarr.Blosc(cname='zstd', clevel=3, shuffle=1)
     img_chunk_size = (100, img_arrays.shape[1], img_arrays.shape[2], img_arrays.shape[3])
     state_chunk_size = (100, state_arrays.shape[1])
     point_cloud_chunk_size = (100, point_cloud_arrays.shape[1], point_cloud_arrays.shape[2])
     depth_chunk_size = (100, depth_arrays.shape[1], depth_arrays.shape[2])
     action_chunk_size = (100, action_arrays.shape[1])
+    lang_goal_chunk_size = (100, lang_emb_arrays.shape[1])
     zarr_data.create_dataset('img', data=img_arrays, chunks=img_chunk_size, dtype='uint8', overwrite=True, compressor=compressor)
     zarr_data.create_dataset('state', data=state_arrays, chunks=state_chunk_size, dtype='float32', overwrite=True, compressor=compressor)
     zarr_data.create_dataset('point_cloud', data=point_cloud_arrays, chunks=point_cloud_chunk_size, dtype='float32', overwrite=True, compressor=compressor)
     zarr_data.create_dataset('depth', data=depth_arrays, chunks=depth_chunk_size, dtype='float32', overwrite=True, compressor=compressor)
     zarr_data.create_dataset('action', data=action_arrays, chunks=action_chunk_size, dtype='float32', overwrite=True, compressor=compressor)
     zarr_meta.create_dataset('episode_ends', data=episode_ends_arrays, dtype='int64', overwrite=True, compressor=compressor)
+    zarr_data.create_dataset('lang_goal_embed', data=lang_emb_arrays, chunks=lang_goal_chunk_size, dtype='float32', overwrite=True, compressor=compressor)
 
 
     # print shape
@@ -396,6 +422,7 @@ def main(args):
     cprint(f'depth shape: {depth_arrays.shape}, range: [{np.min(depth_arrays)}, {np.max(depth_arrays)}]', 'green')
     cprint(f'state shape: {state_arrays.shape}, range: [{np.min(state_arrays)}, {np.max(state_arrays)}]', 'green')
     cprint(f'action shape: {action_arrays.shape}, range: [{np.min(action_arrays)}, {np.max(action_arrays)}]', 'green')
+    cprint(f'lang goal embed shape: {lang_emb_arrays.shape}, range: [{np.min(lang_emb_arrays)}, {np.max(lang_emb_arrays)}]', 'green' )
     cprint(f'Saved zarr file to {save_dir}', 'green')
 
     # clean up
