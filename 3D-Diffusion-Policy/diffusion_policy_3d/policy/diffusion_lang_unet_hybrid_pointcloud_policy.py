@@ -111,7 +111,7 @@ class LangDiffusionUnetHybridPointcloudPolicy(BasePointcloudPolicy):
             self.se3_aug = create_se3_augmentation(self.se3_augmentation_cfg)
         else:
             self.se3_aug = None
-        cprint(f"[DiffusionUnetHybridPointcloudPolicy] use_pc_aug: {self.se3_augmentation_cfg.use_aug}", "yellow")
+        cprint(f"[LangDiffusionUnetHybridPointcloudPolicy] use_pc_aug: {self.se3_augmentation_cfg.use_aug}", "yellow")
 
 
         model = ConditionalUnet1D(

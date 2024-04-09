@@ -294,6 +294,8 @@ class CustomMultiTaskRLBenchEnv(MultiTaskRLBenchEnv):
             self.clip_rn50 = build_model(model.state_dict()).to(self.device )
             del model
 
+        self.lang_goal_embed = None
+
     @property
     def observation_elements(self) -> List[ObservationElement]:
         obs_elems = super(CustomMultiTaskRLBenchEnv, self).observation_elements
@@ -319,14 +321,12 @@ class CustomMultiTaskRLBenchEnv(MultiTaskRLBenchEnv):
 
         # obs_dict = super(CustomMultiTaskRLBenchEnv, self).extract_obs(obs)
         extracted_obs = _extract_obs(obs, self._channels_last, self._observation_config)
-        # extract language embedding
-        if self._include_lang_goal_in_obs:
-            tokens = clip.tokenize([self._lang_goal]).numpy()
-            token_tensor = torch.from_numpy(tokens).to(self.device)
-            with torch.no_grad():
-                lang_feats, lang_embs = _clip_encode_text(self.clip_rn50, token_tensor)
-            extracted_obs["lang_goal_embed"] = lang_feats[0].float().detach().cpu().numpy() # shape (1024,)    
-            extracted_obs["lang_goal"] = self._lang_goal    
+        
+        # if not reset
+        if isinstance(self.lang_goal_embed, np.ndarray):
+            extracted_obs["lang_goal_embed"] = self.lang_goal_embed
+            extracted_obs["lang_goal"] = self._lang_goal
+
         obs_dict = extracted_obs
 
         if self._time_in_state:
@@ -492,6 +492,17 @@ class CustomMultiTaskRLBenchEnv2(CustomMultiTaskRLBenchEnv):
                 self.eval and self._record_every_n > 0 and self._episode_index % self._record_every_n == 0)
         self._episode_index += 1
         self._recorded_images.clear()
+
+        
+        # extract language embedding
+        if self._include_lang_goal_in_obs:
+            tokens = clip.tokenize([self._lang_goal]).numpy()
+            token_tensor = torch.from_numpy(tokens).to(self.device)
+            with torch.no_grad():
+                lang_feats, lang_embs = _clip_encode_text(self.clip_rn50, token_tensor)
+            self._previous_obs_dict["lang_goal_embed"] = lang_feats[0].float().detach().cpu().numpy() # shape (1024,)    
+            self._previous_obs_dict["lang_goal"] = self._lang_goal
+            self.lang_goal_embed = self._previous_obs_dict["lang_goal_embed"]
 
         return self._previous_obs_dict
 

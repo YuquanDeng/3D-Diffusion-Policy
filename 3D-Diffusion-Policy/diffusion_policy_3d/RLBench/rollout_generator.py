@@ -85,11 +85,18 @@ class RolloutGenerator(object):
             else:
                 assert np.isclose(np.linalg.norm(obs["gripper_pose"][3:3+4]), 1.0)
                 agent_pos = np.concatenate([obs["gripper_pose"], np.array([obs["grip"]])])
-                
-            output_obs_history = {
-                "agent_pos": agent_pos,
-                "point_cloud": point_cloud
-            }
+            
+            if self.use_lang:
+                output_obs_history = {
+                    "agent_pos": agent_pos,
+                    "point_cloud": point_cloud,
+                    'lang_goal_embed': obs["lang_goal_embed"]
+                }
+            else:
+                output_obs_history = {
+                    "agent_pos": agent_pos,
+                    "point_cloud": point_cloud,
+                }
         else:
             raise NotImplementedError
             point_cloud = obs["front_point_cloud"].transpose((1, 2, 0)).reshape(-1, 3) # (H, W, 3) -> (H*W, 3)
@@ -195,7 +202,6 @@ class RolloutGenerator(object):
 
         if eval:
             obs = env.reset_to_demo(eval_demo_seed)
-            import pdb;pdb.set_trace()
             # get ground-truth action sequence
             if replay_ground_truth:
                 actions = env.get_ground_truth_action(eval_demo_seed)
