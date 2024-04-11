@@ -261,13 +261,6 @@ class LangDP3Encoder(nn.Module):
         # lang encoder 
         self.lang_preprocess = nn.Linear(lang_emb_dim, lang_output_dim)
         self.n_output_channels  += lang_output_dim
-        # learnable position encoding
-        self.pos_encoding = nn.Parameter(
-            torch.randn(
-                1,
-                lang_emb_dim,
-            )
-        )
 
         cprint(f"[LangDP3Encoder] output dim: {self.n_output_channels}", "red")
 
@@ -290,7 +283,7 @@ class LangDP3Encoder(nn.Module):
         # add lang
         # import pdb;pdb.set_trace()
         lang_goal_embed = observations[self.lang_key]
-        lang_goal_embed += self.pos_encoding 
+        # lang_goal_embed += self.pos_encoding 
         lang_feat = self.lang_preprocess(lang_goal_embed) # B * lang_embed_dim 
         
         
