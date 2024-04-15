@@ -35,10 +35,10 @@ env_runner:
   # cameras: [front, left_shoulder, right_shoulder, wrist]
   # save_video: True
 
+
   # RLBench config
   tasks_to_eval: slide_block_to_color_target
   cameras: [front, left_shoulder, right_shoulder, wrist]
-  # eval_datafolder: /home/nil/manipulation/RVT2/rvt/data/rlbench_data/128x128
   eval_datafolder: /home/nil/manipulation/RVT2/rvt/data/128_same_var
   start_episode: 0
   eval_episodes: 2
@@ -62,18 +62,16 @@ env_runner:
     remove_table': [-1, -100, 0.6, 100, 100, 100]
     slide_block_to_color_target: [-0.4, -0.4, 0, 100, 0.4, 100]
 
-  # lang
-  use_lang: ${policy.use_lang}
 
 dataset:
   # _target_: diffusion_policy_3d.dataset.metaworld_pointcloud_dataset.MetaworldPointcloudDataset
   _target_: diffusion_policy_3d.dataset.rlbench_pointcloud_dataset.RLBenchPointcloudDataset
-  zarr_path: data/rlbench_slide_block_to_color_target_lang_quat_delta_action_expert.zarr
+  # use only 1 variation dataset.
+  zarr_path: data/rlbench_slide_block_to_color_target_same_var_quat_delta_action_expert.zarr
   horizon: ${horizon}
   pad_before: ${eval:'${n_obs_steps}-1'}
   pad_after: ${eval:'${n_action_steps}-1'}
   seed: 42
   val_ratio: 0.02
   max_train_episodes: 90
-  # lang
-  use_lang: ${policy.use_lang}
+
