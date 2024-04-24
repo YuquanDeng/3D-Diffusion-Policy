@@ -17,8 +17,8 @@ export CUDA_VISIBLE_DEVICES=0
 # use script that generate language as well. 
 python gen_demonstration_rlbench_lang_delta_action.py --env_name=${task_name} \
             --num_episodes 100 \
-            --root_dir "/home/nil/manipulation/RVT2/rvt/data/128_same_var" \
-            --save_dir "/home/nil/manipulation/3D-Diffusion-Policy/3D-Diffusion-Policy/data" \
+            --root_dir "/home/nil/manipulation/RVT2/rvt/data/128_1_var" \
+            --save_dir "/home/nil/manipulation/3D-Diffusion-Policy/3D-Diffusion-Policy/data/1_var_exp" \
             --use_point_crop True \
             --num_points 1024 \
             --use_script_policy $use_script_policy \

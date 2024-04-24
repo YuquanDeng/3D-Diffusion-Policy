@@ -198,7 +198,11 @@ def main(args):
     # RLBench raw data
     EPISODES_FOLDER = f"{env_name}/all_variations/episodes"
     data_path = os.path.join(args.root_dir, EPISODES_FOLDER)
-    
+    cprint(f"rlbench raw data dir: {args.root_dir}", "yellow")
+    cprint(f"[use lang]: True", "blue")
+    cprint(f"[use delta action]: True", "blue")    
+    cprint(f"[rotation representation]: {args.rot_representation}", "blue")  
+
     # Load pre-trained language model
     device = torch.device("cuda:0") if args.device == "0" else torch.device("cpu")
     model, _ = load_clip("RN50", device, jit=False)
