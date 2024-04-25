@@ -1,0 +1,51 @@
+Error executing job with overrides: ['task=rlbench_slide_block_to_color_target_overfit', 'training.debug=False', 'training.seed=0', 'training.device=cuda:0', 'exp_name=rlbench_slide_block_to_color_target_overfit-overfit_rlbench-0000', 'logging.mode=online', 'checkpoint.save_ckpt=True']
+Traceback (most recent call last):
+  File "train.py", line 45, in <module>
+    main()
+  File "/home/nil/build_env/miniconda3/envs/dex/lib/python3.8/site-packages/hydra/main.py", line 90, in decorated_main
+    _run_hydra(
+  File "/home/nil/build_env/miniconda3/envs/dex/lib/python3.8/site-packages/hydra/_internal/utils.py", line 389, in _run_hydra
+    _run_app(
+  File "/home/nil/build_env/miniconda3/envs/dex/lib/python3.8/site-packages/hydra/_internal/utils.py", line 452, in _run_app
+    run_and_report(
+  File "/home/nil/build_env/miniconda3/envs/dex/lib/python3.8/site-packages/hydra/_internal/utils.py", line 216, in run_and_report
+    raise ex
+  File "/home/nil/build_env/miniconda3/envs/dex/lib/python3.8/site-packages/hydra/_internal/utils.py", line 213, in run_and_report
+    return func()
+  File "/home/nil/build_env/miniconda3/envs/dex/lib/python3.8/site-packages/hydra/_internal/utils.py", line 453, in <lambda>
+    lambda: hydra.run(
+  File "/home/nil/build_env/miniconda3/envs/dex/lib/python3.8/site-packages/hydra/_internal/hydra.py", line 132, in run
+    _ = ret.return_value
+  File "/home/nil/build_env/miniconda3/envs/dex/lib/python3.8/site-packages/hydra/core/utils.py", line 260, in return_value
+    raise self._return_value
+  File "/home/nil/build_env/miniconda3/envs/dex/lib/python3.8/site-packages/hydra/core/utils.py", line 186, in run_job
+    ret.return_value = task_function(task_cfg)
+  File "train.py", line 41, in main
+    workspace.run()
+  File "/home/nil/manipulation/3D-Diffusion-Policy/3D-Diffusion-Policy/diffusion_policy_3d/workspace/train_diffusion_rlbench_pointcloud_workspace.py", line 163, in run
+    for batch_idx, batch in enumerate(tepoch):
+  File "/home/nil/build_env/miniconda3/envs/dex/lib/python3.8/site-packages/tqdm/std.py", line 1181, in __iter__
+    for obj in iterable:
+  File "/home/nil/build_env/miniconda3/envs/dex/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 633, in __next__
+    data = self._next_data()
+  File "/home/nil/build_env/miniconda3/envs/dex/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 1345, in _next_data
+    return self._process_data(data)
+  File "/home/nil/build_env/miniconda3/envs/dex/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 1371, in _process_data
+    data.reraise()
+  File "/home/nil/build_env/miniconda3/envs/dex/lib/python3.8/site-packages/torch/_utils.py", line 644, in reraise
+    raise exception
+TypeError: Caught TypeError in DataLoader worker process 0.
+Original Traceback (most recent call last):
+  File "/home/nil/build_env/miniconda3/envs/dex/lib/python3.8/site-packages/torch/utils/data/_utils/worker.py", line 308, in _worker_loop
+    data = fetcher.fetch(index)
+  File "/home/nil/build_env/miniconda3/envs/dex/lib/python3.8/site-packages/torch/utils/data/_utils/fetch.py", line 51, in fetch
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+  File "/home/nil/build_env/miniconda3/envs/dex/lib/python3.8/site-packages/torch/utils/data/_utils/fetch.py", line 51, in <listcomp>
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+  File "/home/nil/manipulation/3D-Diffusion-Policy/3D-Diffusion-Policy/diffusion_policy_3d/dataset/rlbench_pointcloud_dataset.py", line 109, in __getitem__
+    torch_data = dict_apply(data, torch.from_numpy)
+  File "/home/nil/manipulation/3D-Diffusion-Policy/3D-Diffusion-Policy/diffusion_policy_3d/common/pytorch_util.py", line 13, in dict_apply
+    result[key] = dict_apply(value, func)
+  File "/home/nil/manipulation/3D-Diffusion-Policy/3D-Diffusion-Policy/diffusion_policy_3d/common/pytorch_util.py", line 15, in dict_apply
+    result[key] = func(value)
+TypeError: expected np.ndarray (got NoneType)

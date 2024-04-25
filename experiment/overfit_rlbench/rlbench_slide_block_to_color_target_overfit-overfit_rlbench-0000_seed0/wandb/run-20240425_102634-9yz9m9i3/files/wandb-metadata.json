@@ -1,0 +1,118 @@
+{
+    "os": "Linux-5.15.0-92-generic-x86_64-with-glibc2.17",
+    "python": "3.8.18",
+    "heartbeatAt": "2024-04-25T17:26:34.956396",
+    "startedAt": "2024-04-25T17:26:34.082193",
+    "docker": null,
+    "cuda": null,
+    "args": [
+        "--config-name=overfit_rlbench.yaml",
+        "task=rlbench_slide_block_to_color_target_overfit",
+        "hydra.run.dir=/home/nil/manipulation/3D-Diffusion-Policy/experiment/overfit_rlbench/rlbench_slide_block_to_color_target_overfit-overfit_rlbench-0000_seed0",
+        "training.debug=False",
+        "training.seed=0",
+        "training.device=cuda:0",
+        "exp_name=rlbench_slide_block_to_color_target_overfit-overfit_rlbench-0000",
+        "logging.mode=online",
+        "checkpoint.save_ckpt=True"
+    ],
+    "state": "running",
+    "program": "train.py",
+    "codePathLocal": "train.py",
+    "codePath": "3D-Diffusion-Policy/train.py",
+    "git": {
+        "remote": "git@github.com:YuquanDeng/3D-Diffusion-Policy.git",
+        "commit": "216510dd8c57a3dff9fc0648e36ddbb960614605"
+    },
+    "email": "yuquand@uw.edu",
+    "root": "/home/nil/manipulation/3D-Diffusion-Policy",
+    "host": "nil",
+    "username": "nil",
+    "executable": "/home/nil/build_env/miniconda3/envs/dex/bin/python",
+    "cpu_count": 6,
+    "cpu_count_logical": 12,
+    "cpu_freq": {
+        "current": 3545.458666666667,
+        "min": 800.0,
+        "max": 4700.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 3700.0,
+            "min": 800.0,
+            "max": 4700.0
+        },
+        {
+            "current": 3700.0,
+            "min": 800.0,
+            "max": 4700.0
+        },
+        {
+            "current": 3700.0,
+            "min": 800.0,
+            "max": 4700.0
+        },
+        {
+            "current": 3700.0,
+            "min": 800.0,
+            "max": 4700.0
+        },
+        {
+            "current": 3700.0,
+            "min": 800.0,
+            "max": 4700.0
+        },
+        {
+            "current": 3700.0,
+            "min": 800.0,
+            "max": 4700.0
+        },
+        {
+            "current": 3700.0,
+            "min": 800.0,
+            "max": 4700.0
+        },
+        {
+            "current": 3700.0,
+            "min": 800.0,
+            "max": 4700.0
+        },
+        {
+            "current": 3700.0,
+            "min": 800.0,
+            "max": 4700.0
+        },
+        {
+            "current": 1524.638,
+            "min": 800.0,
+            "max": 4700.0
+        },
+        {
+            "current": 3700.0,
+            "min": 800.0,
+            "max": 4700.0
+        },
+        {
+            "current": 3700.0,
+            "min": 800.0,
+            "max": 4700.0
+        }
+    ],
+    "disk": {
+        "/": {
+            "total": 3665.954116821289,
+            "used": 3449.0901260375977
+        }
+    },
+    "gpu": "NVIDIA GeForce RTX 3090",
+    "gpu_count": 1,
+    "gpu_devices": [
+        {
+            "name": "NVIDIA GeForce RTX 3090",
+            "memory_total": 25769803776
+        }
+    ],
+    "memory": {
+        "total": 62.73994827270508
+    }
+}

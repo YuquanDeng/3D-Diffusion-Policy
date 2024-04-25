@@ -1,0 +1,7 @@
+- task=rlbench_slide_block_to_color_target_overfit
+- training.debug=False
+- training.seed=0
+- training.device=cuda:0
+- exp_name=rlbench_slide_block_to_color_target_overfit-overfit_rlbench-0000
+- logging.mode=online
+- checkpoint.save_ckpt=True

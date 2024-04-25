@@ -1,0 +1,321 @@
+2024-04-25 10:30:59,221 INFO    StreamThr :1932323 [internal.py:wandb_internal():86] W&B internal server running at pid: 1932323, started at: 2024-04-25 10:30:59.221200
+2024-04-25 10:30:59,222 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: status
+2024-04-25 10:30:59,225 INFO    WriterThread:1932323 [datastore.py:open_for_write():87] open: /home/nil/manipulation/3D-Diffusion-Policy/experiment/overfit_rlbench/rlbench_slide_block_to_color_target_overfit-overfit_rlbench-0000_seed0/wandb/run-20240425_103059-9yz9m9i3/run-9yz9m9i3.wandb
+2024-04-25 10:30:59,225 DEBUG   SenderThread:1932323 [sender.py:send():378] send: header
+2024-04-25 10:30:59,285 DEBUG   SenderThread:1932323 [sender.py:send():378] send: run
+2024-04-25 10:30:59,296 INFO    SenderThread:1932323 [sender.py:_maybe_setup_resume():759] checking resume status for None/diffusion_policy/9yz9m9i3
+2024-04-25 10:30:59,479 INFO    SenderThread:1932323 [sender.py:_maybe_setup_resume():837] configured resuming with: ResumeState(resumed=True,step=0,history=0,events=1,output=51,runtime=7.954864,wandb_runtime=7,summary={'_wandb': {'runtime': 7}},config={'ema': {'desc': None, 'value': {'power': 0.75, '_target_': 'diffusion_policy_3d.model.diffusion.ema_model.EMAModel', 'inv_gamma': 1, 'max_value': 0.9999, 'min_value': 0, 'update_after_step': 0}}, 'name': {'desc': None, 'value': 'train_diffusion_unet_hybrid'}, 'task': {'desc': None, 'value': {'name': 'slide_block_to_color_target', 'dataset': {'seed': 42, 'horizon': 16, '_target_': 'diffusion_policy_3d.dataset.rlbench_pointcloud_dataset.RLBenchPointcloudDataset', 'pad_after': 7, 'val_ratio': 0.02, 'zarr_path': '/home/nil/manipulation/3D-Diffusion-Policy/experiment/overfit_rlbench/rlbench_slide_block_to_color_target_quat_delta_action_expert.zarr', 'pad_before': 3, 'max_train_episodes': 90}, 'task_name': 'train_diffusion_unet_hybrid', 'env_runner': {'device': 'cuda:0', 'cameras': ['front', 'left_shoulder', 'right_shoulder', 'wrist'], 'log_dir': '/home/nil/manipulation/3D-Diffusion-Policy/debug', '_target_': 'diffusion_policy_3d.env_runner.rlbench_pointcloud_runner.RLBenchPointcloudRunner', 'headless': True, 'task_name': ['slide_block_to_color_target'], 'num_points': 1024, 'save_video': True, 'task_bound': {'default': [-1, -100, 0.78, 100, 100, 100], 'remove_scene': [-1, -100, 0, 100, 100, 100], "remove_table'": [-1, -100, 0.6, 100, 100, 100], 'slide_block_to_color_target': [-0.4, -0.4, 0, 100, 0.4, 100]}, 'action_type': 'delta_action', 'n_obs_steps': 4, 'ground_truth': False, 'eval_episodes': 2, 'start_episode': 0, 'tasks_to_eval': 'slide_block_to_color_target', 'episode_length': 200, 'n_action_steps': 8, 'record_every_n': -1, 'rotation_euler': False, 'use_point_crop': True, 'eval_datafolder': '/home/nil/manipulation/RVT2/rvt/data/128_1_var', 'rotation_resolution': 5}, 'shape_meta': {'obs': {'agent_pos': {'type': 'low_dim', 'shape': [8]}, 'point_cloud': {'type': 'point_cloud', 'shape': [1024, 6]}}, 'action': {'shape': [8]}}}}, '_wandb': {'desc': None, 'value': {'t': {'1': [1, 41, 49, 50, 55, 83], '2': [1, 41, 49, 50, 55, 83], '3': [13, 15, 16, 23], '4': '3.8.18', '5': '0.16.4', '8': [5], '13': 'linux-x86_64'}, 'framework': 'torch', 'start_time': 1714065994.0, 'cli_version': '0.16.4', 'is_jupyter_run': False, 'python_version': '3.8.18', 'is_kaggle_kernel': False}}, 'policy': {'desc': None, 'value': {'horizon': 16, '_target_': 'diffusion_policy_3d.policy.diffusion_unet_hybrid_pointcloud_policy.DiffusionUnetHybridPointcloudPolicy', 'n_groups': 8, 'down_dims': [512, 1024, 2048], 'crop_shape': [80, 80], 'shape_meta': {'obs': {'agent_pos': {'type': 'low_dim', 'shape': [8]}, 'point_cloud': {'type': 'point_cloud', 'shape': [1024, 6]}}, 'action': {'shape': [8]}}, 'kernel_size': 5, 'n_obs_steps': 4, 'use_pc_color': True, 'pointnet_type': 'pointnet', 'condition_type': 'film', 'n_action_steps': 8, 'use_point_crop': True, 'noise_scheduler': {'_target_': 'diffusers.schedulers.scheduling_ddim.DDIMScheduler', 'beta_end': 0.02, 'beta_start': 0.0001, 'clip_sample': True, 'steps_offset': 0, 'beta_schedule': 'squaredcos_cap_v2', 'prediction_type': 'sample', 'set_alpha_to_one': True, 'num_train_timesteps': 100}, 'use_up_condition': True, 'use_mid_condition': True, 'encoder_output_dim': 64, 'obs_as_global_cond': True, 'use_down_condition': True, 'num_inference_steps': 10, 'se3_augmentation_cfg': {'jitter': True, 'use_aug': False, 'rotation': False, 'translation': True, 'jitter_scale': 0.01, 'rotation_angle': [15, 15, 15], 'translation_scale': 0.01}, 'pointcloud_encoder_cfg': {'final_norm': 'layernorm', 'in_channels': 3, 'out_channels': 64, 'use_layernorm': True, 'normal_channel': False}, 'diffusion_step_embed_dim': 128}}, 'horizon': {'desc': None, 'value': 16}, 'logging': {'desc': None, 'value': {'id': None, 'mode': 'online', 'name': '0', 'tags': ['train_diffusion_unet_hybrid', 'rlbench'], 'group': 'rlbench_slide_block_to_color_target_overfit-overfit_rlbench-0000', 'resume': True, 'project': 'diffusion_policy'}}, '_target_': {'desc': None, 'value': 'diffusion_policy_3d.workspace.train_diffusion_rlbench_pointcloud_workspace.TrainDiffusionRLBenchPointcloudWorkspace'}, 'exp_name': {'desc': None, 'value': 'rlbench_slide_block_to_color_target_overfit-overfit_rlbench-0000'}, 'training': {'desc': None, 'value': {'seed': 0, 'debug': False, 'device': 'cuda:0', 'resume': True, 'use_ema': True, 'val_every': 1, 'num_epochs': 3000, 'lr_scheduler': 'cosine', 'sample_every': 5, 'max_val_steps': None, 'rollout_every': 200, 'lr_warmup_steps': 500, 'max_train_steps': None, 'checkpoint_every': 200, 'tqdm_interval_sec': 1, 'gradient_accumulate_every': 1}}, 'multi_run': {'desc': None, 'value': {'run_dir': 'data/outputs/2024.04.25/10.26.29_train_diffusion_unet_hybrid_slide_block_to_color_target', 'wandb_name_base': '2024.04.25-10.26.29_train_diffusion_unet_hybrid_slide_block_to_color_target'}}, 'optimizer': {'desc': None, 'value': {'lr': 0.0001, 'eps': 1e-08, 'betas': [0.95, 0.999], '_target_': 'torch.optim.AdamW', 'weight_decay': 1e-06}}, 'task_name': {'desc': None, 'value': 'slide_block_to_color_target'}, 'checkpoint': {'desc': None, 'value': {'topk': {'k': 1, 'mode': 'max', 'format_str': 'epoch={epoch:04d}-test_mean_score={test_mean_score:.3f}.ckpt', 'monitor_key': 'test_mean_score'}, 'save_ckpt': True, 'save_last_ckpt': True, 'save_last_snapshot': False}}, 'dataloader': {'desc': None, 'value': {'shuffle': True, 'batch_size': 128, 'pin_memory': True, 'num_workers': 8, 'persistent_workers': False}}, 'output_dir': {'desc': None, 'value': '/home/nil/manipulation/3D-Diffusion-Policy/experiment/overfit_rlbench/rlbench_slide_block_to_color_target_overfit-overfit_rlbench-0000_seed0'}, 'shape_meta': {'desc': None, 'value': {'obs': {'agent_pos': {'type': 'low_dim', 'shape': [8]}, 'point_cloud': {'type': 'point_cloud', 'shape': [1024, 6]}}, 'action': {'shape': [8]}}}, 'n_obs_steps': {'desc': None, 'value': 4}, 'n_action_steps': {'desc': None, 'value': 8}, 'val_dataloader': {'desc': None, 'value': {'shuffle': False, 'batch_size': 128, 'pin_memory': True, 'num_workers': 8, 'persistent_workers': False}}, 'n_latency_steps': {'desc': None, 'value': 0}, 'dataset_obs_steps': {'desc': None, 'value': 4}, 'obs_as_global_cond': {'desc': None, 'value': True}, 'keypoint_visible_rate': {'desc': None, 'value': 1}},tags=['rlbench', 'train_diffusion_unet_hybrid'])
+2024-04-25 10:30:59,664 INFO    SenderThread:1932323 [dir_watcher.py:__init__():211] watching files in: /home/nil/manipulation/3D-Diffusion-Policy/experiment/overfit_rlbench/rlbench_slide_block_to_color_target_overfit-overfit_rlbench-0000_seed0/wandb/run-20240425_103059-9yz9m9i3/files
+2024-04-25 10:30:59,664 INFO    SenderThread:1932323 [sender.py:_start_run_threads():1099] run started: 9yz9m9i3 with start time 1714066251.266331
+2024-04-25 10:30:59,666 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: summary_record
+2024-04-25 10:30:59,666 INFO    SenderThread:1932323 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-04-25 10:30:59,776 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: check_version
+2024-04-25 10:30:59,777 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: check_version
+2024-04-25 10:30:59,961 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: run_start
+2024-04-25 10:30:59,967 DEBUG   HandlerThread:1932323 [system_info.py:__init__():26] System info init
+2024-04-25 10:30:59,967 DEBUG   HandlerThread:1932323 [system_info.py:__init__():41] System info init done
+2024-04-25 10:30:59,967 INFO    HandlerThread:1932323 [system_monitor.py:start():194] Starting system monitor
+2024-04-25 10:30:59,967 INFO    SystemMonitor:1932323 [system_monitor.py:_start():158] Starting system asset monitoring threads
+2024-04-25 10:30:59,967 INFO    SystemMonitor:1932323 [interfaces.py:start():190] Started cpu monitoring
+2024-04-25 10:30:59,968 INFO    SystemMonitor:1932323 [interfaces.py:start():190] Started disk monitoring
+2024-04-25 10:30:59,969 INFO    SystemMonitor:1932323 [interfaces.py:start():190] Started gpu monitoring
+2024-04-25 10:30:59,969 INFO    SystemMonitor:1932323 [interfaces.py:start():190] Started memory monitoring
+2024-04-25 10:30:59,970 INFO    SystemMonitor:1932323 [interfaces.py:start():190] Started network monitoring
+2024-04-25 10:31:00,127 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: python_packages
+2024-04-25 10:31:00,128 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: python_packages
+2024-04-25 10:31:00,171 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: stop_status
+2024-04-25 10:31:00,171 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: internal_messages
+2024-04-25 10:31:00,172 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: stop_status
+2024-04-25 10:31:00,279 DEBUG   SenderThread:1932323 [sender.py:send():378] send: telemetry
+2024-04-25 10:31:00,279 DEBUG   SenderThread:1932323 [sender.py:send():378] send: config
+2024-04-25 10:31:00,665 INFO    Thread-12 :1932323 [dir_watcher.py:_on_file_created():271] file/dir created: /home/nil/manipulation/3D-Diffusion-Policy/experiment/overfit_rlbench/rlbench_slide_block_to_color_target_overfit-overfit_rlbench-0000_seed0/wandb/run-20240425_103059-9yz9m9i3/files/requirements.txt
+2024-04-25 10:31:00,665 INFO    Thread-12 :1932323 [dir_watcher.py:_on_file_created():271] file/dir created: /home/nil/manipulation/3D-Diffusion-Policy/experiment/overfit_rlbench/rlbench_slide_block_to_color_target_overfit-overfit_rlbench-0000_seed0/wandb/run-20240425_103059-9yz9m9i3/files/wandb-summary.json
+2024-04-25 10:31:01,664 INFO    Thread-12 :1932323 [dir_watcher.py:_on_file_created():271] file/dir created: /home/nil/manipulation/3D-Diffusion-Policy/experiment/overfit_rlbench/rlbench_slide_block_to_color_target_overfit-overfit_rlbench-0000_seed0/wandb/run-20240425_103059-9yz9m9i3/files/output.log
+2024-04-25 10:31:03,665 INFO    Thread-12 :1932323 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nil/manipulation/3D-Diffusion-Policy/experiment/overfit_rlbench/rlbench_slide_block_to_color_target_overfit-overfit_rlbench-0000_seed0/wandb/run-20240425_103059-9yz9m9i3/files/output.log
+2024-04-25 10:31:04,124 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-25 10:31:04,291 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-25 10:31:04,293 DEBUG   SenderThread:1932323 [sender.py:send():378] send: history
+2024-04-25 10:31:04,293 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: summary_record
+2024-04-25 10:31:04,294 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: status_report
+2024-04-25 10:31:04,296 INFO    SenderThread:1932323 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-04-25 10:31:04,457 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-25 10:31:04,458 DEBUG   SenderThread:1932323 [sender.py:send():378] send: history
+2024-04-25 10:31:04,459 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: summary_record
+2024-04-25 10:31:04,459 INFO    SenderThread:1932323 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-04-25 10:31:04,617 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-25 10:31:04,619 DEBUG   SenderThread:1932323 [sender.py:send():378] send: history
+2024-04-25 10:31:04,619 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: summary_record
+2024-04-25 10:31:04,619 INFO    SenderThread:1932323 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-04-25 10:31:04,665 INFO    Thread-12 :1932323 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nil/manipulation/3D-Diffusion-Policy/experiment/overfit_rlbench/rlbench_slide_block_to_color_target_overfit-overfit_rlbench-0000_seed0/wandb/run-20240425_103059-9yz9m9i3/files/wandb-summary.json
+2024-04-25 10:31:04,781 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-25 10:31:04,781 DEBUG   SenderThread:1932323 [sender.py:send():378] send: history
+2024-04-25 10:31:04,782 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: summary_record
+2024-04-25 10:31:04,782 INFO    SenderThread:1932323 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-04-25 10:31:04,942 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-25 10:31:04,943 DEBUG   SenderThread:1932323 [sender.py:send():378] send: history
+2024-04-25 10:31:04,943 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: summary_record
+2024-04-25 10:31:04,944 INFO    SenderThread:1932323 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-04-25 10:31:05,102 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-25 10:31:05,104 DEBUG   SenderThread:1932323 [sender.py:send():378] send: history
+2024-04-25 10:31:05,104 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: summary_record
+2024-04-25 10:31:05,104 INFO    SenderThread:1932323 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-04-25 10:31:05,264 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-25 10:31:05,265 DEBUG   SenderThread:1932323 [sender.py:send():378] send: history
+2024-04-25 10:31:05,265 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: summary_record
+2024-04-25 10:31:05,267 INFO    SenderThread:1932323 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-04-25 10:31:05,426 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-25 10:31:05,427 DEBUG   SenderThread:1932323 [sender.py:send():378] send: history
+2024-04-25 10:31:05,427 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: summary_record
+2024-04-25 10:31:05,428 INFO    SenderThread:1932323 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-04-25 10:31:05,591 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-25 10:31:05,592 DEBUG   SenderThread:1932323 [sender.py:send():378] send: history
+2024-04-25 10:31:05,592 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: summary_record
+2024-04-25 10:31:05,592 INFO    SenderThread:1932323 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-04-25 10:31:05,665 INFO    Thread-12 :1932323 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nil/manipulation/3D-Diffusion-Policy/experiment/overfit_rlbench/rlbench_slide_block_to_color_target_overfit-overfit_rlbench-0000_seed0/wandb/run-20240425_103059-9yz9m9i3/files/output.log
+2024-04-25 10:31:05,666 INFO    Thread-12 :1932323 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nil/manipulation/3D-Diffusion-Policy/experiment/overfit_rlbench/rlbench_slide_block_to_color_target_overfit-overfit_rlbench-0000_seed0/wandb/run-20240425_103059-9yz9m9i3/files/wandb-summary.json
+2024-04-25 10:31:05,751 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-25 10:31:05,752 DEBUG   SenderThread:1932323 [sender.py:send():378] send: history
+2024-04-25 10:31:05,752 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: summary_record
+2024-04-25 10:31:05,753 INFO    SenderThread:1932323 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-04-25 10:31:05,912 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-25 10:31:05,913 DEBUG   SenderThread:1932323 [sender.py:send():378] send: history
+2024-04-25 10:31:05,913 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: summary_record
+2024-04-25 10:31:05,914 INFO    SenderThread:1932323 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-04-25 10:31:06,072 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-25 10:31:06,073 DEBUG   SenderThread:1932323 [sender.py:send():378] send: history
+2024-04-25 10:31:06,073 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: summary_record
+2024-04-25 10:31:06,073 INFO    SenderThread:1932323 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-04-25 10:31:06,233 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-25 10:31:06,234 DEBUG   SenderThread:1932323 [sender.py:send():378] send: history
+2024-04-25 10:31:06,234 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: summary_record
+2024-04-25 10:31:06,235 INFO    SenderThread:1932323 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-04-25 10:31:06,393 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-25 10:31:06,395 DEBUG   SenderThread:1932323 [sender.py:send():378] send: history
+2024-04-25 10:31:06,395 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: summary_record
+2024-04-25 10:31:06,397 INFO    SenderThread:1932323 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-04-25 10:31:06,553 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-25 10:31:06,555 DEBUG   SenderThread:1932323 [sender.py:send():378] send: history
+2024-04-25 10:31:06,555 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: summary_record
+2024-04-25 10:31:06,555 INFO    SenderThread:1932323 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-04-25 10:31:06,666 INFO    Thread-12 :1932323 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nil/manipulation/3D-Diffusion-Policy/experiment/overfit_rlbench/rlbench_slide_block_to_color_target_overfit-overfit_rlbench-0000_seed0/wandb/run-20240425_103059-9yz9m9i3/files/wandb-summary.json
+2024-04-25 10:31:06,720 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-25 10:31:06,722 DEBUG   SenderThread:1932323 [sender.py:send():378] send: history
+2024-04-25 10:31:06,722 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: summary_record
+2024-04-25 10:31:06,722 INFO    SenderThread:1932323 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-04-25 10:31:06,884 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-25 10:31:06,885 DEBUG   SenderThread:1932323 [sender.py:send():378] send: history
+2024-04-25 10:31:06,885 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: summary_record
+2024-04-25 10:31:06,886 INFO    SenderThread:1932323 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-04-25 10:31:07,046 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-25 10:31:07,047 DEBUG   SenderThread:1932323 [sender.py:send():378] send: history
+2024-04-25 10:31:07,047 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: summary_record
+2024-04-25 10:31:07,048 INFO    SenderThread:1932323 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-04-25 10:31:07,206 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-25 10:31:07,207 DEBUG   SenderThread:1932323 [sender.py:send():378] send: history
+2024-04-25 10:31:07,208 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: summary_record
+2024-04-25 10:31:07,208 INFO    SenderThread:1932323 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-04-25 10:31:07,367 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-25 10:31:07,368 DEBUG   SenderThread:1932323 [sender.py:send():378] send: history
+2024-04-25 10:31:07,368 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: summary_record
+2024-04-25 10:31:07,369 INFO    SenderThread:1932323 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-04-25 10:31:07,527 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-25 10:31:07,528 DEBUG   SenderThread:1932323 [sender.py:send():378] send: history
+2024-04-25 10:31:07,529 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: summary_record
+2024-04-25 10:31:07,529 INFO    SenderThread:1932323 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-04-25 10:31:07,666 INFO    Thread-12 :1932323 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nil/manipulation/3D-Diffusion-Policy/experiment/overfit_rlbench/rlbench_slide_block_to_color_target_overfit-overfit_rlbench-0000_seed0/wandb/run-20240425_103059-9yz9m9i3/files/output.log
+2024-04-25 10:31:07,666 INFO    Thread-12 :1932323 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nil/manipulation/3D-Diffusion-Policy/experiment/overfit_rlbench/rlbench_slide_block_to_color_target_overfit-overfit_rlbench-0000_seed0/wandb/run-20240425_103059-9yz9m9i3/files/wandb-summary.json
+2024-04-25 10:31:07,688 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-25 10:31:07,689 DEBUG   SenderThread:1932323 [sender.py:send():378] send: history
+2024-04-25 10:31:07,689 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: summary_record
+2024-04-25 10:31:07,690 INFO    SenderThread:1932323 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-04-25 10:31:07,854 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-25 10:31:07,855 DEBUG   SenderThread:1932323 [sender.py:send():378] send: history
+2024-04-25 10:31:07,855 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: summary_record
+2024-04-25 10:31:07,856 INFO    SenderThread:1932323 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-04-25 10:31:08,015 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-25 10:31:08,016 DEBUG   SenderThread:1932323 [sender.py:send():378] send: history
+2024-04-25 10:31:08,016 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: summary_record
+2024-04-25 10:31:08,016 INFO    SenderThread:1932323 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-04-25 10:31:08,178 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-25 10:31:08,179 DEBUG   SenderThread:1932323 [sender.py:send():378] send: history
+2024-04-25 10:31:08,179 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: summary_record
+2024-04-25 10:31:08,179 INFO    SenderThread:1932323 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-04-25 10:31:08,339 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-25 10:31:08,340 DEBUG   SenderThread:1932323 [sender.py:send():378] send: history
+2024-04-25 10:31:08,341 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: summary_record
+2024-04-25 10:31:08,341 INFO    SenderThread:1932323 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-04-25 10:31:08,500 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-25 10:31:08,501 DEBUG   SenderThread:1932323 [sender.py:send():378] send: history
+2024-04-25 10:31:08,502 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: summary_record
+2024-04-25 10:31:08,504 INFO    SenderThread:1932323 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-04-25 10:31:08,663 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-25 10:31:08,665 DEBUG   SenderThread:1932323 [sender.py:send():378] send: history
+2024-04-25 10:31:08,665 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: summary_record
+2024-04-25 10:31:08,665 INFO    SenderThread:1932323 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-04-25 10:31:08,666 INFO    Thread-12 :1932323 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nil/manipulation/3D-Diffusion-Policy/experiment/overfit_rlbench/rlbench_slide_block_to_color_target_overfit-overfit_rlbench-0000_seed0/wandb/run-20240425_103059-9yz9m9i3/files/wandb-summary.json
+2024-04-25 10:31:08,825 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-25 10:31:08,827 DEBUG   SenderThread:1932323 [sender.py:send():378] send: history
+2024-04-25 10:31:08,827 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: summary_record
+2024-04-25 10:31:08,827 INFO    SenderThread:1932323 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-04-25 10:31:08,992 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-25 10:31:08,993 DEBUG   SenderThread:1932323 [sender.py:send():378] send: history
+2024-04-25 10:31:08,993 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: summary_record
+2024-04-25 10:31:08,994 INFO    SenderThread:1932323 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-04-25 10:31:09,153 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-25 10:31:09,154 DEBUG   SenderThread:1932323 [sender.py:send():378] send: history
+2024-04-25 10:31:09,154 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: summary_record
+2024-04-25 10:31:09,155 INFO    SenderThread:1932323 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-04-25 10:31:09,316 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-25 10:31:09,317 DEBUG   SenderThread:1932323 [sender.py:send():378] send: history
+2024-04-25 10:31:09,318 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: summary_record
+2024-04-25 10:31:09,318 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: status_report
+2024-04-25 10:31:09,319 INFO    SenderThread:1932323 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-04-25 10:31:09,479 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-25 10:31:09,480 DEBUG   SenderThread:1932323 [sender.py:send():378] send: history
+2024-04-25 10:31:09,480 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: summary_record
+2024-04-25 10:31:09,481 INFO    SenderThread:1932323 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-04-25 10:31:09,641 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-25 10:31:09,642 DEBUG   SenderThread:1932323 [sender.py:send():378] send: history
+2024-04-25 10:31:09,642 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: summary_record
+2024-04-25 10:31:09,642 INFO    SenderThread:1932323 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-04-25 10:31:09,666 INFO    Thread-12 :1932323 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nil/manipulation/3D-Diffusion-Policy/experiment/overfit_rlbench/rlbench_slide_block_to_color_target_overfit-overfit_rlbench-0000_seed0/wandb/run-20240425_103059-9yz9m9i3/files/output.log
+2024-04-25 10:31:09,667 INFO    Thread-12 :1932323 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nil/manipulation/3D-Diffusion-Policy/experiment/overfit_rlbench/rlbench_slide_block_to_color_target_overfit-overfit_rlbench-0000_seed0/wandb/run-20240425_103059-9yz9m9i3/files/wandb-summary.json
+2024-04-25 10:31:09,805 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: partial_history
+2024-04-25 10:31:09,806 DEBUG   SenderThread:1932323 [sender.py:send():378] send: history
+2024-04-25 10:31:09,806 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: summary_record
+2024-04-25 10:31:09,807 INFO    SenderThread:1932323 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-04-25 10:31:09,984 DEBUG   SenderThread:1932323 [sender.py:send():378] send: exit
+2024-04-25 10:31:09,985 INFO    SenderThread:1932323 [sender.py:send_exit():585] handling exit code: 255
+2024-04-25 10:31:09,985 INFO    SenderThread:1932323 [sender.py:send_exit():587] handling runtime: 17
+2024-04-25 10:31:09,985 INFO    SenderThread:1932323 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-04-25 10:31:09,985 INFO    SenderThread:1932323 [sender.py:send_exit():593] send defer
+2024-04-25 10:31:09,986 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: defer
+2024-04-25 10:31:09,986 INFO    HandlerThread:1932323 [handler.py:handle_request_defer():172] handle defer: 0
+2024-04-25 10:31:09,986 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: defer
+2024-04-25 10:31:09,986 INFO    SenderThread:1932323 [sender.py:send_request_defer():609] handle sender defer: 0
+2024-04-25 10:31:09,986 INFO    SenderThread:1932323 [sender.py:transition_state():613] send defer: 1
+2024-04-25 10:31:09,986 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: defer
+2024-04-25 10:31:09,986 INFO    HandlerThread:1932323 [handler.py:handle_request_defer():172] handle defer: 1
+2024-04-25 10:31:09,986 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: defer
+2024-04-25 10:31:09,986 INFO    SenderThread:1932323 [sender.py:send_request_defer():609] handle sender defer: 1
+2024-04-25 10:31:09,986 INFO    SenderThread:1932323 [sender.py:transition_state():613] send defer: 2
+2024-04-25 10:31:09,986 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: defer
+2024-04-25 10:31:09,986 INFO    HandlerThread:1932323 [handler.py:handle_request_defer():172] handle defer: 2
+2024-04-25 10:31:09,986 INFO    HandlerThread:1932323 [system_monitor.py:finish():203] Stopping system monitor
+2024-04-25 10:31:09,986 DEBUG   SystemMonitor:1932323 [system_monitor.py:_start():172] Starting system metrics aggregation loop
+2024-04-25 10:31:09,987 DEBUG   SystemMonitor:1932323 [system_monitor.py:_start():179] Finished system metrics aggregation loop
+2024-04-25 10:31:09,987 DEBUG   SystemMonitor:1932323 [system_monitor.py:_start():183] Publishing last batch of metrics
+2024-04-25 10:31:09,987 INFO    HandlerThread:1932323 [interfaces.py:finish():202] Joined cpu monitor
+2024-04-25 10:31:09,987 INFO    HandlerThread:1932323 [interfaces.py:finish():202] Joined disk monitor
+2024-04-25 10:31:10,048 INFO    HandlerThread:1932323 [interfaces.py:finish():202] Joined gpu monitor
+2024-04-25 10:31:10,048 INFO    HandlerThread:1932323 [interfaces.py:finish():202] Joined memory monitor
+2024-04-25 10:31:10,049 INFO    HandlerThread:1932323 [interfaces.py:finish():202] Joined network monitor
+2024-04-25 10:31:10,049 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: defer
+2024-04-25 10:31:10,049 INFO    SenderThread:1932323 [sender.py:send_request_defer():609] handle sender defer: 2
+2024-04-25 10:31:10,049 INFO    SenderThread:1932323 [sender.py:transition_state():613] send defer: 3
+2024-04-25 10:31:10,049 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: defer
+2024-04-25 10:31:10,049 INFO    HandlerThread:1932323 [handler.py:handle_request_defer():172] handle defer: 3
+2024-04-25 10:31:10,050 DEBUG   SenderThread:1932323 [sender.py:send():378] send: history
+2024-04-25 10:31:10,050 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: summary_record
+2024-04-25 10:31:10,050 INFO    SenderThread:1932323 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-04-25 10:31:10,050 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: defer
+2024-04-25 10:31:10,050 INFO    SenderThread:1932323 [sender.py:send_request_defer():609] handle sender defer: 3
+2024-04-25 10:31:10,050 INFO    SenderThread:1932323 [sender.py:transition_state():613] send defer: 4
+2024-04-25 10:31:10,050 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: defer
+2024-04-25 10:31:10,050 INFO    HandlerThread:1932323 [handler.py:handle_request_defer():172] handle defer: 4
+2024-04-25 10:31:10,050 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: defer
+2024-04-25 10:31:10,051 INFO    SenderThread:1932323 [sender.py:send_request_defer():609] handle sender defer: 4
+2024-04-25 10:31:10,051 INFO    SenderThread:1932323 [sender.py:transition_state():613] send defer: 5
+2024-04-25 10:31:10,051 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: defer
+2024-04-25 10:31:10,051 INFO    HandlerThread:1932323 [handler.py:handle_request_defer():172] handle defer: 5
+2024-04-25 10:31:10,051 DEBUG   SenderThread:1932323 [sender.py:send():378] send: summary
+2024-04-25 10:31:10,051 INFO    SenderThread:1932323 [sender.py:_save_file():1365] saving file wandb-summary.json with policy end
+2024-04-25 10:31:10,051 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: defer
+2024-04-25 10:31:10,051 INFO    SenderThread:1932323 [sender.py:send_request_defer():609] handle sender defer: 5
+2024-04-25 10:31:10,051 INFO    SenderThread:1932323 [sender.py:transition_state():613] send defer: 6
+2024-04-25 10:31:10,051 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: defer
+2024-04-25 10:31:10,052 INFO    HandlerThread:1932323 [handler.py:handle_request_defer():172] handle defer: 6
+2024-04-25 10:31:10,052 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: defer
+2024-04-25 10:31:10,052 INFO    SenderThread:1932323 [sender.py:send_request_defer():609] handle sender defer: 6
+2024-04-25 10:31:10,054 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: status_report
+2024-04-25 10:31:10,192 INFO    SenderThread:1932323 [sender.py:transition_state():613] send defer: 7
+2024-04-25 10:31:10,193 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: defer
+2024-04-25 10:31:10,193 INFO    HandlerThread:1932323 [handler.py:handle_request_defer():172] handle defer: 7
+2024-04-25 10:31:10,193 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: defer
+2024-04-25 10:31:10,193 INFO    SenderThread:1932323 [sender.py:send_request_defer():609] handle sender defer: 7
+2024-04-25 10:31:10,667 INFO    Thread-12 :1932323 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nil/manipulation/3D-Diffusion-Policy/experiment/overfit_rlbench/rlbench_slide_block_to_color_target_overfit-overfit_rlbench-0000_seed0/wandb/run-20240425_103059-9yz9m9i3/files/config.yaml
+2024-04-25 10:31:10,667 INFO    Thread-12 :1932323 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nil/manipulation/3D-Diffusion-Policy/experiment/overfit_rlbench/rlbench_slide_block_to_color_target_overfit-overfit_rlbench-0000_seed0/wandb/run-20240425_103059-9yz9m9i3/files/wandb-summary.json
+2024-04-25 10:31:10,985 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: poll_exit
+2024-04-25 10:31:11,653 INFO    SenderThread:1932323 [sender.py:transition_state():613] send defer: 8
+2024-04-25 10:31:11,654 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: poll_exit
+2024-04-25 10:31:11,656 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: defer
+2024-04-25 10:31:11,656 INFO    HandlerThread:1932323 [handler.py:handle_request_defer():172] handle defer: 8
+2024-04-25 10:31:11,657 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: defer
+2024-04-25 10:31:11,657 INFO    SenderThread:1932323 [sender.py:send_request_defer():609] handle sender defer: 8
+2024-04-25 10:31:11,657 INFO    SenderThread:1932323 [job_builder.py:build():298] Attempting to build job artifact
+2024-04-25 10:31:11,658 INFO    SenderThread:1932323 [sender.py:transition_state():613] send defer: 9
+2024-04-25 10:31:11,658 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: defer
+2024-04-25 10:31:11,659 INFO    HandlerThread:1932323 [handler.py:handle_request_defer():172] handle defer: 9
+2024-04-25 10:31:11,659 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: defer
+2024-04-25 10:31:11,660 INFO    SenderThread:1932323 [sender.py:send_request_defer():609] handle sender defer: 9
+2024-04-25 10:31:11,660 INFO    SenderThread:1932323 [dir_watcher.py:finish():358] shutting down directory watcher
+2024-04-25 10:31:11,668 INFO    Thread-12 :1932323 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nil/manipulation/3D-Diffusion-Policy/experiment/overfit_rlbench/rlbench_slide_block_to_color_target_overfit-overfit_rlbench-0000_seed0/wandb/run-20240425_103059-9yz9m9i3/files/output.log
+2024-04-25 10:31:11,669 INFO    SenderThread:1932323 [dir_watcher.py:finish():388] scan: /home/nil/manipulation/3D-Diffusion-Policy/experiment/overfit_rlbench/rlbench_slide_block_to_color_target_overfit-overfit_rlbench-0000_seed0/wandb/run-20240425_103059-9yz9m9i3/files
+2024-04-25 10:31:11,670 INFO    SenderThread:1932323 [dir_watcher.py:finish():402] scan save: /home/nil/manipulation/3D-Diffusion-Policy/experiment/overfit_rlbench/rlbench_slide_block_to_color_target_overfit-overfit_rlbench-0000_seed0/wandb/run-20240425_103059-9yz9m9i3/files/requirements.txt requirements.txt
+2024-04-25 10:31:11,670 INFO    SenderThread:1932323 [dir_watcher.py:finish():402] scan save: /home/nil/manipulation/3D-Diffusion-Policy/experiment/overfit_rlbench/rlbench_slide_block_to_color_target_overfit-overfit_rlbench-0000_seed0/wandb/run-20240425_103059-9yz9m9i3/files/wandb-summary.json wandb-summary.json
+2024-04-25 10:31:11,679 INFO    SenderThread:1932323 [dir_watcher.py:finish():402] scan save: /home/nil/manipulation/3D-Diffusion-Policy/experiment/overfit_rlbench/rlbench_slide_block_to_color_target_overfit-overfit_rlbench-0000_seed0/wandb/run-20240425_103059-9yz9m9i3/files/output.log output.log
+2024-04-25 10:31:11,680 INFO    SenderThread:1932323 [dir_watcher.py:finish():402] scan save: /home/nil/manipulation/3D-Diffusion-Policy/experiment/overfit_rlbench/rlbench_slide_block_to_color_target_overfit-overfit_rlbench-0000_seed0/wandb/run-20240425_103059-9yz9m9i3/files/config.yaml config.yaml
+2024-04-25 10:31:11,686 INFO    SenderThread:1932323 [sender.py:transition_state():613] send defer: 10
+2024-04-25 10:31:11,687 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: defer
+2024-04-25 10:31:11,687 INFO    HandlerThread:1932323 [handler.py:handle_request_defer():172] handle defer: 10
+2024-04-25 10:31:11,700 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: defer
+2024-04-25 10:31:11,701 INFO    SenderThread:1932323 [sender.py:send_request_defer():609] handle sender defer: 10
+2024-04-25 10:31:11,701 INFO    SenderThread:1932323 [file_pusher.py:finish():172] shutting down file pusher
+2024-04-25 10:31:11,985 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: poll_exit
+2024-04-25 10:31:11,986 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: poll_exit
+2024-04-25 10:31:12,135 INFO    wandb-upload_0:1932323 [upload_job.py:push():131] Uploaded file /home/nil/manipulation/3D-Diffusion-Policy/experiment/overfit_rlbench/rlbench_slide_block_to_color_target_overfit-overfit_rlbench-0000_seed0/wandb/run-20240425_103059-9yz9m9i3/files/requirements.txt
+2024-04-25 10:31:12,265 INFO    wandb-upload_2:1932323 [upload_job.py:push():131] Uploaded file /home/nil/manipulation/3D-Diffusion-Policy/experiment/overfit_rlbench/rlbench_slide_block_to_color_target_overfit-overfit_rlbench-0000_seed0/wandb/run-20240425_103059-9yz9m9i3/files/output.log
+2024-04-25 10:31:12,273 INFO    wandb-upload_3:1932323 [upload_job.py:push():131] Uploaded file /home/nil/manipulation/3D-Diffusion-Policy/experiment/overfit_rlbench/rlbench_slide_block_to_color_target_overfit-overfit_rlbench-0000_seed0/wandb/run-20240425_103059-9yz9m9i3/files/config.yaml
+2024-04-25 10:31:12,296 INFO    wandb-upload_1:1932323 [upload_job.py:push():131] Uploaded file /home/nil/manipulation/3D-Diffusion-Policy/experiment/overfit_rlbench/rlbench_slide_block_to_color_target_overfit-overfit_rlbench-0000_seed0/wandb/run-20240425_103059-9yz9m9i3/files/wandb-summary.json
+2024-04-25 10:31:12,496 INFO    Thread-11 :1932323 [sender.py:transition_state():613] send defer: 11
+2024-04-25 10:31:12,497 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: defer
+2024-04-25 10:31:12,497 INFO    HandlerThread:1932323 [handler.py:handle_request_defer():172] handle defer: 11
+2024-04-25 10:31:12,497 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: defer
+2024-04-25 10:31:12,497 INFO    SenderThread:1932323 [sender.py:send_request_defer():609] handle sender defer: 11
+2024-04-25 10:31:12,497 INFO    SenderThread:1932323 [file_pusher.py:join():178] waiting for file pusher
+2024-04-25 10:31:12,497 INFO    SenderThread:1932323 [sender.py:transition_state():613] send defer: 12
+2024-04-25 10:31:12,497 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: defer
+2024-04-25 10:31:12,497 INFO    HandlerThread:1932323 [handler.py:handle_request_defer():172] handle defer: 12
+2024-04-25 10:31:12,498 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: defer
+2024-04-25 10:31:12,498 INFO    SenderThread:1932323 [sender.py:send_request_defer():609] handle sender defer: 12
+2024-04-25 10:31:12,498 INFO    SenderThread:1932323 [file_stream.py:finish():595] file stream finish called
+2024-04-25 10:31:12,569 INFO    SenderThread:1932323 [file_stream.py:finish():599] file stream finish is done
+2024-04-25 10:31:12,569 INFO    SenderThread:1932323 [sender.py:transition_state():613] send defer: 13
+2024-04-25 10:31:12,569 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: defer
+2024-04-25 10:31:12,569 INFO    HandlerThread:1932323 [handler.py:handle_request_defer():172] handle defer: 13
+2024-04-25 10:31:12,569 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: defer
+2024-04-25 10:31:12,569 INFO    SenderThread:1932323 [sender.py:send_request_defer():609] handle sender defer: 13
+2024-04-25 10:31:12,569 INFO    SenderThread:1932323 [sender.py:transition_state():613] send defer: 14
+2024-04-25 10:31:12,570 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: defer
+2024-04-25 10:31:12,570 INFO    HandlerThread:1932323 [handler.py:handle_request_defer():172] handle defer: 14
+2024-04-25 10:31:12,570 DEBUG   SenderThread:1932323 [sender.py:send():378] send: final
+2024-04-25 10:31:12,570 DEBUG   SenderThread:1932323 [sender.py:send():378] send: footer
+2024-04-25 10:31:12,570 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: defer
+2024-04-25 10:31:12,570 INFO    SenderThread:1932323 [sender.py:send_request_defer():609] handle sender defer: 14
+2024-04-25 10:31:12,571 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: poll_exit
+2024-04-25 10:31:12,571 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: poll_exit
+2024-04-25 10:31:12,571 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: poll_exit
+2024-04-25 10:31:12,572 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: server_info
+2024-04-25 10:31:12,572 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: poll_exit
+2024-04-25 10:31:12,572 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: server_info
+2024-04-25 10:31:12,572 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: get_summary
+2024-04-25 10:31:12,574 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: sampled_history
+2024-04-25 10:31:12,574 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: internal_messages
+2024-04-25 10:31:12,575 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: job_info
+2024-04-25 10:31:12,631 DEBUG   SenderThread:1932323 [sender.py:send_request():405] send_request: job_info
+2024-04-25 10:31:12,631 DEBUG   HandlerThread:1932323 [handler.py:handle_request():146] handle_request: shutdown
+2024-04-25 10:31:12,631 INFO    HandlerThread:1932323 [handler.py:finish():869] shutting down handler
+2024-04-25 10:31:13,575 INFO    WriterThread:1932323 [datastore.py:close():296] close: /home/nil/manipulation/3D-Diffusion-Policy/experiment/overfit_rlbench/rlbench_slide_block_to_color_target_overfit-overfit_rlbench-0000_seed0/wandb/run-20240425_103059-9yz9m9i3/run-9yz9m9i3.wandb
+2024-04-25 10:31:13,631 INFO    SenderThread:1932323 [sender.py:finish():1521] shutting down sender
+2024-04-25 10:31:13,631 INFO    SenderThread:1932323 [file_pusher.py:finish():172] shutting down file pusher
+2024-04-25 10:31:13,632 INFO    SenderThread:1932323 [file_pusher.py:join():178] waiting for file pusher

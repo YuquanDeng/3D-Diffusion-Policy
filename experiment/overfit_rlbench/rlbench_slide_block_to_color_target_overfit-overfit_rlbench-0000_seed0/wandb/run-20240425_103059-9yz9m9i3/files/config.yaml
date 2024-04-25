@@ -1,0 +1,323 @@
+wandb_version: 1
+
+task:
+  desc: null
+  value:
+    name: slide_block_to_color_target
+    task_name: train_diffusion_unet_hybrid
+    shape_meta:
+      obs:
+        point_cloud:
+          shape:
+          - 1024
+          - 6
+          type: point_cloud
+        agent_pos:
+          shape:
+          - 8
+          type: low_dim
+      action:
+        shape:
+        - 8
+    env_runner:
+      _target_: diffusion_policy_3d.env_runner.rlbench_pointcloud_runner.RLBenchPointcloudRunner
+      n_obs_steps: 4
+      n_action_steps: 8
+      task_name:
+      - slide_block_to_color_target
+      device: cuda:0
+      use_point_crop: true
+      num_points: 1024
+      tasks_to_eval: slide_block_to_color_target
+      cameras:
+      - front
+      - left_shoulder
+      - right_shoulder
+      - wrist
+      eval_datafolder: /home/nil/manipulation/RVT2/rvt/data/128_1_var
+      start_episode: 0
+      eval_episodes: 2
+      episode_length: 200
+      record_every_n: -1
+      ground_truth: false
+      headless: true
+      save_video: true
+      log_dir: /home/nil/manipulation/3D-Diffusion-Policy/debug
+      action_type: delta_action
+      rotation_resolution: 5
+      rotation_euler: false
+      task_bound:
+        default:
+        - -1
+        - -100
+        - 0.78
+        - 100
+        - 100
+        - 100
+        remove_scene:
+        - -1
+        - -100
+        - 0
+        - 100
+        - 100
+        - 100
+        remove_table':
+        - -1
+        - -100
+        - 0.6
+        - 100
+        - 100
+        - 100
+        slide_block_to_color_target:
+        - -0.4
+        - -0.4
+        - 0
+        - 100
+        - 0.4
+        - 100
+    dataset:
+      _target_: diffusion_policy_3d.dataset.rlbench_pointcloud_dataset.RLBenchPointcloudDataset
+      zarr_path: /home/nil/manipulation/3D-Diffusion-Policy/experiment/overfit_rlbench/rlbench_slide_block_to_color_target_quat_delta_action_expert.zarr
+      horizon: 16
+      pad_before: 3
+      pad_after: 7
+      seed: 42
+      val_ratio: 0.02
+      max_train_episodes: 90
+name:
+  desc: null
+  value: train_diffusion_unet_hybrid
+_target_:
+  desc: null
+  value: diffusion_policy_3d.workspace.train_diffusion_rlbench_pointcloud_workspace.TrainDiffusionRLBenchPointcloudWorkspace
+task_name:
+  desc: null
+  value: slide_block_to_color_target
+shape_meta:
+  desc: null
+  value:
+    obs:
+      point_cloud:
+        shape:
+        - 1024
+        - 6
+        type: point_cloud
+      agent_pos:
+        shape:
+        - 8
+        type: low_dim
+    action:
+      shape:
+      - 8
+exp_name:
+  desc: null
+  value: rlbench_slide_block_to_color_target_overfit-overfit_rlbench-0000
+horizon:
+  desc: null
+  value: 16
+n_obs_steps:
+  desc: null
+  value: 4
+n_action_steps:
+  desc: null
+  value: 8
+n_latency_steps:
+  desc: null
+  value: 0
+dataset_obs_steps:
+  desc: null
+  value: 4
+keypoint_visible_rate:
+  desc: null
+  value: 1.0
+obs_as_global_cond:
+  desc: null
+  value: true
+policy:
+  desc: null
+  value:
+    _target_: diffusion_policy_3d.policy.diffusion_unet_hybrid_pointcloud_policy.DiffusionUnetHybridPointcloudPolicy
+    use_point_crop: true
+    condition_type: film
+    use_down_condition: true
+    use_mid_condition: true
+    use_up_condition: true
+    diffusion_step_embed_dim: 128
+    down_dims:
+    - 512
+    - 1024
+    - 2048
+    crop_shape:
+    - 80
+    - 80
+    encoder_output_dim: 64
+    horizon: 16
+    kernel_size: 5
+    n_action_steps: 8
+    n_groups: 8
+    n_obs_steps: 4
+    noise_scheduler:
+      _target_: diffusers.schedulers.scheduling_ddim.DDIMScheduler
+      num_train_timesteps: 100
+      beta_start: 0.0001
+      beta_end: 0.02
+      beta_schedule: squaredcos_cap_v2
+      clip_sample: true
+      set_alpha_to_one: true
+      steps_offset: 0
+      prediction_type: sample
+    num_inference_steps: 10
+    obs_as_global_cond: true
+    shape_meta:
+      obs:
+        point_cloud:
+          shape:
+          - 1024
+          - 6
+          type: point_cloud
+        agent_pos:
+          shape:
+          - 8
+          type: low_dim
+      action:
+        shape:
+        - 8
+    use_pc_color: true
+    pointnet_type: pointnet
+    se3_augmentation_cfg:
+      use_aug: false
+      rotation: false
+      rotation_angle:
+      - 15
+      - 15
+      - 15
+      translation: true
+      translation_scale: 0.01
+      jitter: true
+      jitter_scale: 0.01
+    pointcloud_encoder_cfg:
+      in_channels: 3
+      out_channels: 64
+      use_layernorm: true
+      final_norm: layernorm
+      normal_channel: false
+ema:
+  desc: null
+  value:
+    _target_: diffusion_policy_3d.model.diffusion.ema_model.EMAModel
+    update_after_step: 0
+    inv_gamma: 1.0
+    power: 0.75
+    min_value: 0.0
+    max_value: 0.9999
+dataloader:
+  desc: null
+  value:
+    batch_size: 128
+    num_workers: 8
+    shuffle: true
+    pin_memory: true
+    persistent_workers: false
+val_dataloader:
+  desc: null
+  value:
+    batch_size: 128
+    num_workers: 8
+    shuffle: false
+    pin_memory: true
+    persistent_workers: false
+optimizer:
+  desc: null
+  value:
+    _target_: torch.optim.AdamW
+    lr: 0.0001
+    betas:
+    - 0.95
+    - 0.999
+    eps: 1.0e-08
+    weight_decay: 1.0e-06
+training:
+  desc: null
+  value:
+    device: cuda:0
+    seed: 0
+    debug: false
+    resume: true
+    lr_scheduler: cosine
+    lr_warmup_steps: 500
+    num_epochs: 3000
+    gradient_accumulate_every: 1
+    use_ema: true
+    rollout_every: 200
+    checkpoint_every: 200
+    val_every: 1
+    sample_every: 5
+    max_train_steps: null
+    max_val_steps: null
+    tqdm_interval_sec: 1.0
+logging:
+  desc: null
+  value:
+    group: rlbench_slide_block_to_color_target_overfit-overfit_rlbench-0000
+    id: null
+    mode: online
+    name: '0'
+    project: diffusion_policy
+    resume: true
+    tags:
+    - train_diffusion_unet_hybrid
+    - rlbench
+checkpoint:
+  desc: null
+  value:
+    save_ckpt: true
+    topk:
+      monitor_key: test_mean_score
+      mode: max
+      k: 1
+      format_str: epoch={epoch:04d}-test_mean_score={test_mean_score:.3f}.ckpt
+    save_last_ckpt: true
+    save_last_snapshot: false
+multi_run:
+  desc: null
+  value:
+    run_dir: data/outputs/2024.04.25/10.30.54_train_diffusion_unet_hybrid_slide_block_to_color_target
+    wandb_name_base: 2024.04.25-10.30.54_train_diffusion_unet_hybrid_slide_block_to_color_target
+_wandb:
+  desc: null
+  value:
+    python_version: 3.8.18
+    cli_version: 0.16.4
+    framework: torch
+    is_jupyter_run: false
+    is_kaggle_kernel: false
+    start_time: 1714066259.0
+    t:
+      1:
+      - 1
+      - 41
+      - 49
+      - 50
+      - 55
+      - 83
+      2:
+      - 1
+      - 41
+      - 49
+      - 50
+      - 55
+      - 83
+      3:
+      - 5
+      - 13
+      - 15
+      - 16
+      - 23
+      4: 3.8.18
+      5: 0.16.4
+      8:
+      - 5
+      13: linux-x86_64
+output_dir:
+  desc: null
+  value: /home/nil/manipulation/3D-Diffusion-Policy/experiment/overfit_rlbench/rlbench_slide_block_to_color_target_overfit-overfit_rlbench-0000_seed0

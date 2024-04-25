@@ -92,15 +92,25 @@ class RLBenchPointcloudDataset(BasePointcloudDataset):
             lang_goal_embed = sample['lang_goal_embed'][:,].astype(np.float32) # (T, lang_embed_dim) 
         # point_cloud_robot = sample['point_cloud_robot'][:,].astype(np.float32) # (T, 1024, 3)
 
-        data = {
-            'obs': {
-                'point_cloud': point_cloud, # T, 1024, 3
-                # 'point_cloud_robot': point_cloud_robot, # T, 1024, 3
-                'agent_pos': agent_pos, # T, D_pos
-                'lang_goal_embed': lang_goal_embed # None or (T, lang_embed_dim)
-            },
-            'action': sample['action'].astype(np.float32) # T, D_action
-        }
+        if self.use_lang:
+            data = {
+                'obs': {
+                    'point_cloud': point_cloud, # T, 1024, 3
+                    # 'point_cloud_robot': point_cloud_robot, # T, 1024, 3
+                    'agent_pos': agent_pos, # T, D_pos
+                    'lang_goal_embed': lang_goal_embed # None or (T, lang_embed_dim)
+                },
+                'action': sample['action'].astype(np.float32) # T, D_action
+            }
+        else:
+            data = {
+                'obs': {
+                    'point_cloud': point_cloud, # T, 1024, 3
+                    # 'point_cloud_robot': point_cloud_robot, # T, 1024, 3
+                    'agent_pos': agent_pos, # T, D_pos
+                },
+                'action': sample['action'].astype(np.float32) # T, D_action
+            }            
         return data
     
     def __getitem__(self, idx: int) -> Dict[str, torch.Tensor]:
