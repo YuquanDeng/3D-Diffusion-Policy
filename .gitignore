@@ -45,3 +45,7 @@ personal_TASK.md
 easytrain.sh
 nohup.out
 output/
+
+debug/real_world_demo
+debug/videos
+experiment/overfit_rlbench/rlbench_slide_block_to_color_target_overfit-overfit_rlbench-0425_seed0/
